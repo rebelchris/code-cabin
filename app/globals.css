@@ -1,0 +1,142 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated to warm, cozy cabin-inspired color palette */
+  --background: #fffbeb; /* Soft warm beige background */
+  --foreground: #374151; /* Deep charcoal for text */
+  --card: #ffffff; /* Clean white for cards */
+  --card-foreground: #4b5563; /* Warm gray for card text */
+  --popover: #ffffff;
+  --popover-foreground: #374151;
+  --primary: #ea580c; /* Warm fireplace orange */
+  --primary-foreground: #ffffff;
+  --secondary: #f97316; /* Lighter warm orange */
+  --secondary-foreground: #ffffff;
+  --muted: #fef7ed; /* Very soft warm background */
+  --muted-foreground: #6b7280;
+  --accent: #f97316; /* Cozy accent orange */
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb; /* Soft border */
+  --input: #ffffff;
+  --ring: #f97316;
+  --chart-1: #ea580c;
+  --chart-2: #f97316;
+  --chart-3: #fed7aa;
+  --chart-4: #4b5563;
+  --chart-5: #ffffff;
+  --radius: 0.75rem; /* More rounded for cozy feel */
+  --sidebar: #fffbeb;
+  --sidebar-foreground: #4b5563;
+  --sidebar-primary: #ea580c;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f97316;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #ea580c;
+  /* Updated font variables for warmer typography */
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-open-sans: "Open Sans", sans-serif;
+  --font-crimson: "Crimson Text", serif;
+  --font-source-sans: "Source Sans 3", sans-serif;
+}
+
+.dark {
+  /* Warmer dark mode colors for cozy evening cabin feel */
+  --background: #1c1917; /* Dark warm brown */
+  --foreground: #fef7ed; /* Warm cream text */
+  --card: #292524; /* Darker warm brown for cards */
+  --card-foreground: #fef7ed;
+  --popover: #1c1917;
+  --popover-foreground: #fef7ed;
+  --primary: #f97316; /* Bright warm orange for dark mode */
+  --primary-foreground: #1c1917;
+  --secondary: #44403c;
+  --secondary-foreground: #fef7ed;
+  --muted: #292524;
+  --muted-foreground: #a8a29e;
+  --accent: #f97316;
+  --accent-foreground: #1c1917;
+  --destructive: #ef4444;
+  --destructive-foreground: #fef7ed;
+  --border: #44403c;
+  --input: #292524;
+  --ring: #f97316;
+  --chart-1: #f97316;
+  --chart-2: #ea580c;
+  --chart-3: #fed7aa;
+  --chart-4: #a8a29e;
+  --chart-5: #292524;
+  --sidebar: #1c1917;
+  --sidebar-foreground: #fef7ed;
+  --sidebar-primary: #f97316;
+  --sidebar-primary-foreground: #1c1917;
+  --sidebar-accent: #292524;
+  --sidebar-accent-foreground: #fef7ed;
+  --sidebar-border: #44403c;
+  --sidebar-ring: #f97316;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  /* Updated font system for warmer typography */
+  --font-heading: var(--font-montserrat);
+  --font-sans: var(--font-open-sans);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  /* Added custom cabin-inspired styling */
+  .cabin-texture {
+    background-image: radial-gradient(circle at 1px 1px, rgba(234, 88, 12, 0.05) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+  .warm-glow {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.1);
+  }
+}
