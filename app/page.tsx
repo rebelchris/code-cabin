@@ -350,24 +350,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      <footer className="bg-foreground text-background py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0 flex items-center gap-3">
-              <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-xl">
-                <TreePine className="h-6 w-6 text-primary" />
-                <Mountain className="h-4 w-4 text-primary opacity-70" />
-              </div>
-              <div>
-                <p className="font-heading font-black text-xl">CodeCabin.dev</p>
-                <p className="text-sm opacity-70">Where engineering leaders gather</p>
-              </div>
-            </div>
-            <div className="text-sm opacity-70">© 2024 CodeCabin.dev. Built with care and coffee.</div>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

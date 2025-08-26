@@ -3,6 +3,10 @@ import type { Metadata } from "next"
 import { Montserrat } from "next/font/google"
 import { Open_Sans } from "next/font/google"
 import "./globals.css"
+import {
+  Mountain,
+  TreePine,
+} from "lucide-react"
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -34,46 +38,20 @@ export default function RootLayout({
     <html lang="en" className={`${montserrat.variable} ${openSans.variable} antialiased`}>
       <body className="font-sans">
         {children}
-        <footer className="bg-gradient-to-r from-orange-50 to-amber-50 border-t border-orange-200 mt-16">
-          <div className="max-w-6xl mx-auto px-6 py-12">
-            <div className="grid md:grid-cols-3 gap-8">
-              <div>
-                <h3 className="font-bold text-lg text-orange-900 mb-4">CodeCabin.dev</h3>
-                <p className="text-orange-700 leading-relaxed">
-                  A cozy corner for engineering leaders sharing real stories and practical wisdom.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-orange-900 mb-4">Connect</h4>
-                <div className="space-y-2">
-                  <a href="#" className="block text-orange-700 hover:text-orange-900 transition-colors">
-                    LinkedIn
-                  </a>
-                  <a href="#" className="block text-orange-700 hover:text-orange-900 transition-colors">
-                    Twitter
-                  </a>
-                  <a href="#" className="block text-orange-700 hover:text-orange-900 transition-colors">
-                    GitHub
-                  </a>
+        <footer className="bg-foreground text-background py-12 px-4">
+          <div className="container mx-auto max-w-6xl">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="mb-6 md:mb-0 flex items-center gap-3">
+                <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-xl">
+                  <TreePine className="h-6 w-6 text-primary" />
+                  <Mountain className="h-4 w-4 text-primary opacity-70" />
+                </div>
+                <div>
+                  <p className="font-heading font-black text-xl">CodeCabin.dev</p>
+                  <p className="text-sm opacity-70">Where engineering leaders gather</p>
                 </div>
               </div>
-              <div>
-                <h4 className="font-semibold text-orange-900 mb-4">Subscribe</h4>
-                <p className="text-orange-700 mb-4">Get new stories delivered to your inbox</p>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    placeholder="your@email.com"
-                    className="flex-1 px-3 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  />
-                  <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-                    Subscribe
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="border-t border-orange-200 mt-8 pt-8 text-center text-orange-600">
-              <p>&copy; 2024 CodeCabin.dev. Built with care for the engineering community.</p>
+              <div className="text-sm opacity-70">© 2024 CodeCabin.dev. Built with care and coffee.</div>
             </div>
           </div>
         </footer>
