@@ -3,71 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, ArrowLeft, TreePine, Mountain } from "lucide-react"
 import Link from "next/link"
+import { getAllStories, getCategories } from "@/lib/markdown"
 
 export default function StoriesPage() {
-  const stories = [
-    {
-      id: "why-1on1s-matter",
-      category: "Stories from the Trenches",
-      title: "The Day I Learned Why 1:1s Aren't Just Status Updates",
-      description: "How a single conversation changed my entire approach to managing people and building trust.",
-      readTime: "8 min read",
-      date: "Dec 15, 2024",
-    },
-    {
-      id: "saying-no-framework",
-      category: "Practical Tools",
-      title: "The Art of Saying No: Protecting Your Team's Focus",
-      description: "A framework for filtering requests and maintaining team productivity without burning bridges.",
-      readTime: "12 min read",
-      date: "Dec 8, 2024",
-    },
-    {
-      id: "blame-culture-fix",
-      category: "Building Culture",
-      title: "How I Accidentally Created a Blame Culture (And Fixed It)",
-      description: "The subtle ways good intentions can create toxic environments, and how to course-correct.",
-      readTime: "10 min read",
-      date: "Nov 28, 2024",
-    },
-    {
-      id: "sprint-planning-revolution",
-      category: "Stories from the Trenches",
-      title: "The Sprint Planning Meeting That Changed Everything",
-      description:
-        "When our team was drowning in scope creep, one simple change transformed our entire delivery process.",
-      readTime: "7 min read",
-      date: "Nov 20, 2024",
-    },
-    {
-      id: "smartest-person-trap",
-      category: "Personal Reflections",
-      title: "Why I Stopped Trying to Be the Smartest Person in the Room",
-      description:
-        "The ego trap that nearly derailed my leadership journey and how letting go made me a better manager.",
-      readTime: "9 min read",
-      date: "Nov 12, 2024",
-    },
-    {
-      id: "incident-response-playbook",
-      category: "Practical Tools",
-      title: "Building an Incident Response Culture That Actually Works",
-      description: "Beyond the runbooks: creating a team culture that thrives under pressure and learns from failure.",
-      readTime: "15 min read",
-      date: "Oct 30, 2024",
-    },
-  ]
-
-  const categories = [
-    { name: "All Stories", count: stories.length },
-    {
-      name: "Stories from the Trenches",
-      count: stories.filter((s) => s.category === "Stories from the Trenches").length,
-    },
-    { name: "Practical Tools", count: stories.filter((s) => s.category === "Practical Tools").length },
-    { name: "Building Culture", count: stories.filter((s) => s.category === "Building Culture").length },
-    { name: "Personal Reflections", count: stories.filter((s) => s.category === "Personal Reflections").length },
-  ]
+  const stories = getAllStories()
+  const categories = getCategories()
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,7 +70,7 @@ export default function StoriesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {stories.map((story) => (
               <Card
-                key={story.id}
+                key={story.slug}
                 className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 group border-2 hover:border-primary/20 warm-glow"
               >
                 <CardHeader className="pb-4">
@@ -140,19 +80,18 @@ export default function StoriesPage() {
                     </Badge>
                     <span className="text-xs text-muted-foreground">{story.date}</span>
                   </div>
-                  <CardTitle className="font-heading text-xl font-bold group-hover:text-primary transition-colors leading-tight">
-                    {story.title}
-                  </CardTitle>
+                  <Link href={`/stories/${story.slug}`}>
+                    <CardTitle className="font-heading text-xl font-bold group-hover:text-primary transition-colors leading-tight hover:underline cursor-pointer">
+                      {story.title}
+                    </CardTitle>
+                  </Link>
                   <CardDescription className="text-base leading-relaxed mt-3">{story.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">{story.readTime}</span>
-                    <Link href={`/stories/${story.id}`}>
-                      <Button
-                        variant="ghost"
-                        className="p-0 h-auto font-semibold text-primary hover:text-primary/80 text-base"
-                      >
+                    <Link href={`/stories/${story.slug}`}>
+                      <Button className="btn-primary">
                         Read story <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>

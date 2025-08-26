@@ -4,41 +4,40 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated to warm, cozy cabin-inspired color palette */
-  --background: #fffbeb; /* Soft warm beige background */
-  --foreground: #374151; /* Deep charcoal for text */
-  --card: #ffffff; /* Clean white for cards */
-  --card-foreground: #4b5563; /* Warm gray for card text */
-  --popover: #ffffff;
+  /* Replacing with warmer orange-tinted color scheme */
+  --background: #fffbeb;
+  --foreground: #374151;
+  --card: #fff;
+  --card-foreground: #4b5563;
+  --popover: #fff;
   --popover-foreground: #374151;
-  --primary: #ea580c; /* Warm fireplace orange */
-  --primary-foreground: #ffffff;
-  --secondary: #f97316; /* Lighter warm orange */
-  --secondary-foreground: #ffffff;
-  --muted: #fef7ed; /* Very soft warm background */
+  --primary: #ea580c;
+  --primary-foreground: #fff;
+  --secondary: #f97316;
+  --secondary-foreground: #fff;
+  --muted: #fef7ed;
   --muted-foreground: #6b7280;
-  --accent: #f97316; /* Cozy accent orange */
-  --accent-foreground: #ffffff;
+  --accent: #f97316;
+  --accent-foreground: #fff;
   --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --border: #e5e7eb; /* Soft border */
-  --input: #ffffff;
+  --destructive-foreground: #fff;
+  --border: #e5e7eb;
+  --input: #fff;
   --ring: #f97316;
   --chart-1: #ea580c;
   --chart-2: #f97316;
   --chart-3: #fed7aa;
   --chart-4: #4b5563;
-  --chart-5: #ffffff;
-  --radius: 0.75rem; /* More rounded for cozy feel */
+  --chart-5: #fff;
+  --radius: .75rem;
   --sidebar: #fffbeb;
   --sidebar-foreground: #4b5563;
   --sidebar-primary: #ea580c;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary-foreground: #fff;
   --sidebar-accent: #f97316;
-  --sidebar-accent-foreground: #ffffff;
+  --sidebar-accent-foreground: #fff;
   --sidebar-border: #e5e7eb;
   --sidebar-ring: #ea580c;
-  /* Updated font variables for warmer typography */
   --font-montserrat: "Montserrat", sans-serif;
   --font-open-sans: "Open Sans", sans-serif;
   --font-crimson: "Crimson Text", serif;
@@ -46,39 +45,38 @@
 }
 
 .dark {
-  /* Warmer dark mode colors for cozy evening cabin feel */
-  --background: #1c1917; /* Dark warm brown */
-  --foreground: #fef7ed; /* Warm cream text */
-  --card: #292524; /* Darker warm brown for cards */
-  --card-foreground: #fef7ed;
-  --popover: #1c1917;
-  --popover-foreground: #fef7ed;
-  --primary: #f97316; /* Bright warm orange for dark mode */
-  --primary-foreground: #1c1917;
-  --secondary: #44403c;
-  --secondary-foreground: #fef7ed;
-  --muted: #292524;
-  --muted-foreground: #a8a29e;
-  --accent: #f97316;
-  --accent-foreground: #1c1917;
-  --destructive: #ef4444;
-  --destructive-foreground: #fef7ed;
-  --border: #44403c;
-  --input: #292524;
-  --ring: #f97316;
-  --chart-1: #f97316;
-  --chart-2: #ea580c;
-  --chart-3: #fed7aa;
-  --chart-4: #a8a29e;
-  --chart-5: #292524;
-  --sidebar: #1c1917;
-  --sidebar-foreground: #fef7ed;
-  --sidebar-primary: #f97316;
-  --sidebar-primary-foreground: #1c1917;
-  --sidebar-accent: #292524;
-  --sidebar-accent-foreground: #fef7ed;
-  --sidebar-border: #44403c;
-  --sidebar-ring: #f97316;
+  --background: oklch(0.12 0.02 30);
+  --foreground: oklch(0.95 0.01 45);
+  --card: oklch(0.14 0.02 30);
+  --card-foreground: oklch(0.95 0.01 45);
+  --popover: oklch(0.14 0.02 30);
+  --popover-foreground: oklch(0.95 0.01 45);
+  --primary: oklch(0.65 0.15 35);
+  --primary-foreground: oklch(0.12 0.02 30);
+  --secondary: oklch(0.2 0.03 35);
+  --secondary-foreground: oklch(0.9 0.02 40);
+  --muted: oklch(0.18 0.03 35);
+  --muted-foreground: oklch(0.65 0.05 35);
+  --accent: oklch(0.22 0.04 35);
+  --accent-foreground: oklch(0.9 0.02 40);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.25 0.04 35);
+  --input: oklch(0.25 0.04 35);
+  --ring: oklch(0.65 0.15 35);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
 }
 
 @theme inline {
@@ -118,10 +116,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* Updated font system for warmer typography */
-  --font-heading: var(--font-montserrat);
-  --font-sans: var(--font-open-sans);
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @layer base {
@@ -129,14 +123,71 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
   }
-  /* Added custom cabin-inspired styling */
-  .cabin-texture {
-    background-image: radial-gradient(circle at 1px 1px, rgba(234, 88, 12, 0.05) 1px, transparent 0);
-    background-size: 20px 20px;
+
+  /* Custom prose styling for markdown content */
+  .prose {
+    @apply text-foreground max-w-none;
   }
-  .warm-glow {
-    box-shadow: 0 0 20px rgba(249, 115, 22, 0.1);
+
+  .prose h1 {
+    @apply text-4xl font-bold text-foreground mb-6 mt-8;
+  }
+
+  .prose h2 {
+    @apply text-3xl font-bold text-foreground mb-4 mt-6;
+  }
+
+  .prose h3 {
+    @apply text-2xl font-semibold text-foreground mb-3 mt-5;
+  }
+
+  .prose h4 {
+    @apply text-xl font-semibold text-primary mb-2 mt-4;
+  }
+
+  .prose p {
+    @apply text-lg leading-relaxed mb-4 text-foreground;
+  }
+
+  .prose strong {
+    @apply font-semibold text-primary;
+  }
+
+  .prose em {
+    @apply italic text-muted-foreground;
+  }
+
+  .prose ul {
+    @apply list-disc pl-6 mb-4;
+  }
+
+  .prose ol {
+    @apply list-decimal pl-6 mb-4;
+  }
+
+  .prose li {
+    @apply mb-2 text-foreground;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary pl-6 py-2 bg-muted/30 rounded-r-lg my-4 italic text-muted-foreground;
+  }
+
+  .prose code {
+    @apply bg-muted px-2 py-1 rounded text-sm font-mono text-foreground;
+  }
+
+  .prose pre {
+    @apply bg-muted p-4 rounded-lg overflow-x-auto mb-4;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose a {
+    @apply text-primary hover:text-primary/80 underline;
   }
 }
