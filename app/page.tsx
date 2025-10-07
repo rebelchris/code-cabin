@@ -1,355 +1,537 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import {
-  ArrowRight,
-  BookOpen,
-  Users,
-  Target,
-  Mail,
-  Linkedin,
-  Github,
-  Coffee,
-  Flame,
-  Mountain,
-  TreePine,
-} from "lucide-react"
+"use client"
 
-export default function HomePage() {
+import { useState, useMemo, useEffect, useRef } from "react"
+import { TimelineCard } from "@/components/timeline-card"
+import { ActivityModal } from "@/components/activity-modal"
+
+export interface Activity {
+  id: string
+  title: string
+  age: string
+  date: string
+  timeInvestment: string
+  whatWeTried: string
+  whatHappened: string
+  whyItWorked: string
+  theLesson: string
+  image: string
+  tags?: string[]
+  type: "leadership" | "process" | "team-building"
+  ageMonths: number // for filtering (repurposed as experience level)
+  timestamp: Date
+}
+
+const activities: Activity[] = [
+  {
+    id: "one-on-ones-framework",
+    title: "Building a Consistent 1:1 Framework",
+    age: "3 years experience",
+    date: "October 2025",
+    timeInvestment: "2 weeks to establish",
+    whatWeTried:
+      'Instead of ad-hoc check-ins, we implemented a structured 1:1 framework with consistent questions: "What\'s energizing you?", "What\'s draining you?", and "How can I help?" We kept a shared doc for each team member.',
+    whatHappened:
+      "The shift was immediate. Team members came prepared with topics. Conversations became deeper and more productive. What used to be status updates became genuine coaching sessions. Retention improved and people felt truly heard.",
+    whyItWorked:
+      "Structure creates safety. When people know what to expect, they can prepare meaningful topics. The shared doc created continuity between sessions and showed we actually remembered and cared about their concerns.",
+    theLesson: "Consistency in 1:1s isn't about rigidity - it's about creating a reliable space for growth.",
+    image: "/one-on-ones.jpg",
+    tags: ["leadership", "coaching"],
+    type: "leadership",
+    ageMonths: 36,
+    timestamp: new Date("2025-10-15"),
+  },
+  {
+    id: "incident-postmortem-culture",
+    title: "Creating Blameless Postmortem Culture",
+    age: "5 years experience",
+    date: "March 2024",
+    timeInvestment: "3 months to establish",
+    whatWeTried:
+      "After a major outage, we shifted from 'who broke it' to 'what broke and how do we prevent it'. We created a template focusing on timeline, impact, root cause, and action items - with zero mention of individual names.",
+    whatHappened:
+      "The first few postmortems were awkward. People expected blame. But after three incidents handled this way, engineers started volunteering to lead postmortems. Psychological safety increased. We caught systemic issues we'd been missing.",
+    whyItWorked:
+      "Blame shuts down learning. When people feel safe admitting mistakes, they share the full story. That's where the real insights live. Systems fail, not people.",
+    theLesson: "The best postmortems focus on what we learned, not who we blame.",
+    image: "/postmortem-meeting.jpg",
+    tags: ["process", "culture"],
+    type: "process",
+    ageMonths: 60,
+    timestamp: new Date("2024-03-20"),
+  },
+  {
+    id: "engineering-offsite",
+    title: "Planning an Effective Engineering Offsite",
+    age: "4 years experience",
+    date: "March 2024",
+    timeInvestment: "2 days planning, 2 days offsite",
+    whatWeTried:
+      "Organized a two-day offsite focused on team bonding and strategic planning. Mixed structured sessions (roadmap planning, architecture discussions) with unstructured time (team dinner, games, walks).",
+    whatHappened:
+      "The unstructured time created the most value. Engineers who rarely talked started collaborating. Cross-team relationships formed. The strategic discussions were productive because people felt connected first.",
+    whyItWorked:
+      "You can't force team bonding, but you can create conditions for it. The mix of structure and freedom let people connect authentically while still accomplishing business goals.",
+    theLesson: "The best offsites balance intentional structure with space for organic connection.",
+    image: "/team-offsite.jpg",
+    tags: ["team-building", "culture"],
+    type: "team-building",
+    ageMonths: 48,
+    timestamp: new Date("2024-03-15"),
+  },
+  {
+    id: "sprint-retrospective-format",
+    title: "Revamping Sprint Retrospectives",
+    age: "3.5 years experience",
+    date: "March 2024",
+    timeInvestment: "30 minutes per sprint",
+    whatWeTried:
+      "Replaced the tired 'start/stop/continue' format with rotating themes: 'What energized us?', 'What slowed us down?', 'What surprised us?'. Each sprint, a different team member facilitated.",
+    whatHappened:
+      "Participation skyrocketed. People who never spoke up started sharing. The rotating facilitator meant everyone felt ownership. We uncovered blockers we'd been ignoring for months.",
+    whyItWorked:
+      "Fresh formats prevent retrospective fatigue. When everyone facilitates, everyone pays attention. The questions focused on feelings and surprises, not just process, which surfaced deeper insights.",
+    theLesson: "Retrospectives die when they become routine. Keep them fresh, keep them human.",
+    image: "/retrospective-board.jpg",
+    tags: ["process", "agile"],
+    type: "process",
+    ageMonths: 42,
+    timestamp: new Date("2024-03-10"),
+  },
+  {
+    id: "career-ladder-framework",
+    title: "Implementing a Clear Career Ladder",
+    age: "4.5 years experience",
+    date: "February 2024",
+    timeInvestment: "1 month to design, ongoing to maintain",
+    whatWeTried:
+      "Created a transparent career ladder with clear expectations for each level. Included technical skills, leadership behaviors, and impact scope. Made it public and discussed it in team meetings.",
+    whatHappened:
+      "Engineers finally understood what 'senior' meant. Promotion conversations became objective, not political. People started self-identifying growth areas. The ambiguity that caused frustration disappeared.",
+    whyItWorked:
+      "Transparency removes mystery. When expectations are clear, people can chart their own path. It shifted promotion conversations from 'why not me?' to 'here's what I'm working on'.",
+    theLesson: "Career growth shouldn't be a guessing game. Make the path visible.",
+    image: "/career-ladder.jpg",
+    tags: ["leadership", "growth"],
+    type: "leadership",
+    ageMonths: 54,
+    timestamp: new Date("2024-02-20"),
+  },
+  {
+    id: "technical-debt-prioritization",
+    title: "Making Technical Debt Visible",
+    age: "5 years experience",
+    date: "January 2024",
+    timeInvestment: "Ongoing practice",
+    whatWeTried:
+      "Started tracking technical debt in the same backlog as features. Each debt item got a 'pain score' (how much it hurts) and 'effort score'. We committed to spending 20% of each sprint on the highest pain-to-effort ratio items.",
+    whatHappened:
+      "Product managers finally understood why 'simple' features took forever. Engineers felt heard. The codebase started improving incrementally. Velocity actually increased as we paid down the worst debt.",
+    whyItWorked:
+      "Technical debt is invisible until you make it visible. Treating it like features gave it legitimacy. The pain-to-effort ratio made prioritization objective, not emotional.",
+    theLesson: "Technical debt isn't a separate backlog - it's part of the work.",
+    image: "/technical-debt.jpg",
+    tags: ["process", "technical"],
+    type: "process",
+    ageMonths: 60,
+    timestamp: new Date("2024-01-15"),
+  },
+]
+
+export default function Home() {
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+  const [selectedYear, setSelectedYear] = useState<string | null>(null)
+  const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [selectedAge, setSelectedAge] = useState<string | null>(null)
+  const [likes, setLikes] = useState<Record<string, number>>({})
+  const [likedByUser, setLikedByUser] = useState<Record<string, boolean>>({})
+  const observerRef = useRef<IntersectionObserver | null>(null)
+
+  useEffect(() => {
+    const initialLikes: Record<string, number> = {}
+    const initialLikedByUser: Record<string, boolean> = {}
+    activities.forEach((activity) => {
+      initialLikes[activity.id] = Math.floor(Math.random() * 50) + 15
+      initialLikedByUser[activity.id] = false
+    })
+    setLikes(initialLikes)
+    setLikedByUser(initialLikedByUser)
+  }, [])
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate-on-scroll")
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" },
+    )
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+    }
+  }, [])
+
+  const handleLike = (activityId: string) => {
+    setLikedByUser((prev) => ({
+      ...prev,
+      [activityId]: !prev[activityId],
+    }))
+    setLikes((prev) => ({
+      ...prev,
+      [activityId]: prev[activityId] + (likedByUser[activityId] ? -1 : 1),
+    }))
+  }
+
+  const years = useMemo(() => {
+    const yearSet = new Set(activities.map((a) => new Date(a.timestamp).getFullYear()))
+    return Array.from(yearSet).sort((a, b) => b - a)
+  }, [])
+
+  const filteredActivities = useMemo(() => {
+    return activities
+      .filter((activity) => {
+        if (selectedYear && new Date(activity.timestamp).getFullYear() !== Number.parseInt(selectedYear)) {
+          return false
+        }
+        if (selectedType && activity.type !== selectedType) {
+          return false
+        }
+        if (selectedAge) {
+          const [min, max] = selectedAge.split("-").map(Number)
+          if (activity.ageMonths < min || activity.ageMonths > max) {
+            return false
+          }
+        }
+        return true
+      })
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+  }, [selectedYear, selectedType, selectedAge])
+
+  const typeCounts = useMemo(() => {
+    const counts = { all: activities.length, leadership: 0, process: 0, "team-building": 0 }
+    activities.forEach((a) => {
+      counts[a.type]++
+    })
+    return counts
+  }, [])
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-gradient-to-r from-primary via-primary to-secondary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div
-            className="w-full h-full"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              backgroundSize: "60px 60px",
-            }}
-          ></div>
+    <div className="flex min-h-screen flex-col">
+      <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">
+        <div className="mx-auto mb-8 max-w-6xl text-center">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">codecabin.dev</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Lessons from the engineering management trenches - real experiments, honest outcomes
+          </p>
         </div>
-        <div className="container mx-auto px-4 py-8 relative">
-          <nav className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 p-3 bg-white/10 rounded-xl backdrop-blur-sm">
-                <TreePine className="h-8 w-8" />
-                <Mountain className="h-6 w-6 opacity-70" />
-              </div>
+
+        <div className="mx-auto flex max-w-6xl gap-6 lg:gap-8">
+          {/* Sidebar - hidden on mobile, shown on lg+ */}
+          <aside className="hidden w-64 shrink-0 lg:block">
+            <div className="sticky top-6 space-y-6 rounded-2xl border border-border/50 bg-background/95 p-4 shadow-lg backdrop-blur-md">
               <div>
-                <h1 className="text-3xl font-black font-heading tracking-tight">CodeCabin.dev</h1>
-                <p className="text-sm opacity-90 mt-1 font-medium">Where engineering leaders gather</p>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Category</h3>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setSelectedType(null)}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                      selectedType === null
+                        ? "bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>all</span>
+                    <span className="text-xs opacity-70">{typeCounts.all}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedType("leadership")}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                      selectedType === "leadership"
+                        ? "bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>leadership</span>
+                    <span className="text-xs opacity-70">{typeCounts.leadership}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedType("process")}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                      selectedType === "process"
+                        ? "bg-gradient-to-r from-green-500 to-green-400 text-white shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>process</span>
+                    <span className="text-xs opacity-70">{typeCounts.process}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedType("team-building")}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                      selectedType === "team-building"
+                        ? "bg-gradient-to-r from-purple-500 to-purple-400 text-white shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>team-building</span>
+                    <span className="text-xs opacity-70">{typeCounts["team-building"]}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Experience
+                </h3>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setSelectedAge(null)}
+                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
+                      selectedAge === null
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    All levels
+                  </button>
+                  <button
+                    onClick={() => setSelectedAge("24-36")}
+                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
+                      selectedAge === "24-36"
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    2-3 years
+                  </button>
+                  <button
+                    onClick={() => setSelectedAge("36-48")}
+                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
+                      selectedAge === "36-48"
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    3-4 years
+                  </button>
+                  <button
+                    onClick={() => setSelectedAge("48-72")}
+                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
+                      selectedAge === "48-72"
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    4-6 years
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Time</h3>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setSelectedYear(null)}
+                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
+                      selectedYear === null
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    All time
+                  </button>
+                  {years.map((year) => (
+                    <button
+                      key={year}
+                      onClick={() => setSelectedYear(year.toString())}
+                      className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
+                        selectedYear === year.toString()
+                          ? "bg-accent/20 text-accent"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#stories" className="hover:opacity-80 transition-all duration-200 font-medium hover:scale-105">
-                Stories
-              </a>
-              <a href="#about" className="hover:opacity-80 transition-all duration-200 font-medium hover:scale-105">
-                About
-              </a>
-              <a href="#connect" className="hover:opacity-80 transition-all duration-200 font-medium hover:scale-105">
-                Connect
-              </a>
-            </div>
-          </nav>
-        </div>
-      </header>
+          </aside>
 
-      <section className="py-24 px-4 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent"></div>
-        <div className="container mx-auto max-w-5xl text-center relative">
-          <div className="mb-12">
-            <div className="relative inline-block">
-              <img
-                src="/cozy-cabin-workspace.png"
-                alt="Cozy cabin workspace"
-                className="w-40 h-40 rounded-2xl mx-auto mb-8 shadow-2xl border-4 border-white warm-glow"
-              />
-              <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground p-2 rounded-full shadow-lg">
-                <Flame className="h-5 w-5" />
+          {/* Main content area */}
+          <div className="min-w-0 flex-1 lg:max-w-md">
+            <div className="mb-6 rounded-2xl border border-border/50 bg-background/95 p-4 shadow-lg backdrop-blur-md lg:hidden">
+              <div className="mb-4">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Category</h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedType(null)}
+                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedType === null
+                        ? "bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>all</span>
+                    <span className="text-xs opacity-70">{typeCounts.all}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedType("leadership")}
+                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedType === "leadership"
+                        ? "bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>leadership</span>
+                    <span className="text-xs opacity-70">{typeCounts.leadership}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedType("process")}
+                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedType === "process"
+                        ? "bg-gradient-to-r from-green-500 to-green-400 text-white shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>process</span>
+                    <span className="text-xs opacity-70">{typeCounts.process}</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedType("team-building")}
+                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedType === "team-building"
+                        ? "bg-gradient-to-r from-purple-500 to-purple-400 text-white shadow-md"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <span>team-building</span>
+                    <span className="text-xs opacity-70">{typeCounts["team-building"]}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Experience
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedAge(null)}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedAge === null
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    All levels
+                  </button>
+                  <button
+                    onClick={() => setSelectedAge("24-36")}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedAge === "24-36"
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    2-3 years
+                  </button>
+                  <button
+                    onClick={() => setSelectedAge("36-48")}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedAge === "36-48"
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    3-4 years
+                  </button>
+                  <button
+                    onClick={() => setSelectedAge("48-72")}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedAge === "48-72"
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    4-6 years
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Time</h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedYear(null)}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedYear === null
+                        ? "bg-accent/20 text-accent"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    All time
+                  </button>
+                  {years.map((year) => (
+                    <button
+                      key={year}
+                      onClick={() => setSelectedYear(year.toString())}
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        selectedYear === year.toString()
+                          ? "bg-accent/20 text-accent"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-          <h2 className="text-5xl md:text-7xl font-black font-heading text-foreground mb-8 leading-tight">
-            Welcome to the <span className="text-primary">cabin</span>
-          </h2>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-            Pull up a chair by the fire. I'm sharing the stories, lessons, and honest reflections from my journey
-            leading engineering teams. <span className="text-primary font-semibold">No corporate speak</span>—just real
-            talk about what works and what doesn't.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              size="lg"
-              className="text-lg px-10 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-            >
-              <Coffee className="mr-3 h-6 w-6" />
-              Start Reading
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-lg px-8 py-4 rounded-2xl font-medium border-2 hover:bg-muted transition-all duration-200 bg-transparent"
-            >
-              <Flame className="mr-2 h-5 w-5" />
-              Join the Fire
-            </Button>
-          </div>
-        </div>
-      </section>
 
-      <section id="stories" className="py-20 px-4 bg-muted/50">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl md:text-5xl font-black font-heading mb-4">What's in the Cabin</h3>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Four corners of wisdom, each with its own stories to tell
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20 warm-glow group">
-              <CardHeader className="pb-4">
-                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <BookOpen className="h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="font-heading text-xl font-bold">Stories from the Trenches</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base leading-relaxed">
-                  Real situations, honest mistakes, and hard-won wisdom from leading engineering teams through complex
-                  challenges.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20 warm-glow group">
-              <CardHeader className="pb-4">
-                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <Target className="h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="font-heading text-xl font-bold">Practical Tools</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base leading-relaxed">
-                  Frameworks, templates, and processes that actually work in the messy reality of software development.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20 warm-glow group">
-              <CardHeader className="pb-4">
-                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="font-heading text-xl font-bold">Building Culture</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base leading-relaxed">
-                  How to create teams where people thrive, psychological safety flourishes, and great software gets
-                  built.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/20 warm-glow group">
-              <CardHeader className="pb-4">
-                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <Coffee className="h-8 w-8 text-primary" />
-                </div>
-                <CardTitle className="font-heading text-xl font-bold">Personal Reflections</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base leading-relaxed">
-                  My journey from code to leadership, industry observations, and the ongoing adventure of growth.
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl md:text-5xl font-black font-heading mb-4">Recent Fireside Chats</h3>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Stories worth sharing over a warm cup of coffee
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 group border-2 hover:border-primary/20 warm-glow">
-              <CardHeader className="pb-4">
-                <Badge variant="secondary" className="w-fit mb-3 rounded-full px-3 py-1 font-medium">
-                  Stories from the Trenches
-                </Badge>
-                <CardTitle className="font-heading text-xl font-bold group-hover:text-primary transition-colors leading-tight">
-                  The Day I Learned Why 1:1s Aren't Just Status Updates
-                </CardTitle>
-                <CardDescription className="text-base leading-relaxed mt-3">
-                  How a single conversation changed my entire approach to managing people and building trust.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link href="/stories/why-1on1s-matter">
-                  <Button
-                    variant="ghost"
-                    className="p-0 h-auto font-semibold text-primary hover:text-primary/80 text-base"
-                  >
-                    Read the story <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 group border-2 hover:border-primary/20 warm-glow">
-              <CardHeader className="pb-4">
-                <Badge variant="secondary" className="w-fit mb-3 rounded-full px-3 py-1 font-medium">
-                  Practical Tools
-                </Badge>
-                <CardTitle className="font-heading text-xl font-bold group-hover:text-primary transition-colors leading-tight">
-                  The Art of Saying No: Protecting Your Team's Focus
-                </CardTitle>
-                <CardDescription className="text-base leading-relaxed mt-3">
-                  A framework for filtering requests and maintaining team productivity without burning bridges.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link href="/stories/saying-no-framework">
-                  <Button
-                    variant="ghost"
-                    className="p-0 h-auto font-semibold text-primary hover:text-primary/80 text-base"
-                  >
-                    Get the framework <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 group border-2 hover:border-primary/20 warm-glow">
-              <CardHeader className="pb-4">
-                <Badge variant="secondary" className="w-fit mb-3 rounded-full px-3 py-1 font-medium">
-                  Building Culture
-                </Badge>
-                <CardTitle className="font-heading text-xl font-bold group-hover:text-primary transition-colors leading-tight">
-                  How I Accidentally Created a Blame Culture (And Fixed It)
-                </CardTitle>
-                <CardDescription className="text-base leading-relaxed mt-3">
-                  The subtle ways good intentions can create toxic environments, and how to course-correct.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link href="/stories/blame-culture-fix">
-                  <Button
-                    variant="ghost"
-                    className="p-0 h-auto font-semibold text-primary hover:text-primary/80 text-base"
-                  >
-                    Learn from my mistake <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="text-center mt-12">
-            <Link href="/stories">
-              <Button size="lg" variant="outline" className="rounded-xl font-semibold bg-transparent">
-                View All Stories <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section id="about" className="py-20 px-4 bg-gradient-to-br from-muted/30 to-muted/60">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h3 className="text-4xl md:text-5xl font-black font-heading mb-8 text-foreground">About Your Host</h3>
-              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                I've been building and leading engineering teams for over a decade, from scrappy startups to scaling
-                organizations. I've made plenty of mistakes, learned from incredible mentors, and discovered what
-                actually works when managing people who build software.
+            <div className="mb-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                {filteredActivities.length} {filteredActivities.length === 1 ? "post" : "posts"}
               </p>
-              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                This cabin is my attempt to share the hard-won lessons, practical frameworks, and honest reflections in
-                a space that feels more like a conversation with a friend than a corporate blog post.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Badge variant="outline" className="rounded-full px-4 py-2 text-sm font-medium border-2">
-                  10+ years leadership
-                </Badge>
-                <Badge variant="outline" className="rounded-full px-4 py-2 text-sm font-medium border-2">
-                  Multiple scale-ups
-                </Badge>
-                <Badge variant="outline" className="rounded-full px-4 py-2 text-sm font-medium border-2">
-                  Team builder
-                </Badge>
-                <Badge variant="outline" className="rounded-full px-4 py-2 text-sm font-medium border-2">
-                  Coffee enthusiast
-                </Badge>
-              </div>
             </div>
-            <div className="text-center">
-              <img
-                src="/engineering-team-fireside.png"
-                alt="Engineering team by the fireside"
-                className="rounded-3xl shadow-2xl border-4 border-white warm-glow"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section
-        id="connect"
-        className="py-20 px-4 bg-gradient-to-r from-primary via-primary to-secondary text-primary-foreground relative overflow-hidden"
-      >
-        <div className="absolute inset-0 opacity-20">
-          <div
-            className="w-full h-full"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              backgroundSize: "60px 60px",
-            }}
-          ></div>
-        </div>
-        <div className="container mx-auto max-w-5xl text-center relative">
-          <div className="mb-8">
-            <Flame className="h-16 w-16 mx-auto mb-6 opacity-90" />
-          </div>
-          <h3 className="text-4xl md:text-5xl font-black font-heading mb-8">Pull Up a Chair</h3>
-          <p className="text-xl md:text-2xl opacity-90 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-            Want to share your own engineering leadership stories, discuss a challenge you're facing, or just say hello?
-            The cabin door is always open.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Button
-              variant="secondary"
-              size="lg"
-              className="text-lg px-10 py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-            >
-              <Mail className="mr-3 h-6 w-6" />
-              Start a Conversation
-            </Button>
-            <div className="flex gap-4">
-              <Button
-                variant="ghost"
-                size="lg"
-                className="text-primary-foreground hover:bg-white/10 rounded-2xl p-4 transition-all duration-200 hover:scale-110"
-              >
-                <Linkedin className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="lg"
-                className="text-primary-foreground hover:bg-white/10 rounded-2xl p-4 transition-all duration-200 hover:scale-110"
-              >
-                <Github className="h-6 w-6" />
-              </Button>
+            <div className="space-y-4">
+              {filteredActivities.map((activity, index) => (
+                <TimelineCard
+                  key={activity.id}
+                  activity={activity}
+                  onClick={() => setSelectedActivity(activity)}
+                  onLike={() => handleLike(activity.id)}
+                  likes={likes[activity.id] || 0}
+                  isLiked={likedByUser[activity.id] || false}
+                  observerRef={observerRef}
+                  index={index}
+                />
+              ))}
+
+              {filteredActivities.length === 0 && (
+                <div className="py-12 text-center">
+                  <p className="text-sm text-muted-foreground">No posts found with the selected filters.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </section>
+      </main>
+
+      <ActivityModal
+        activity={selectedActivity}
+        onClose={() => setSelectedActivity(null)}
+        likes={selectedActivity ? likes[selectedActivity.id] || 0 : 0}
+        isLiked={selectedActivity ? likedByUser[selectedActivity.id] || false : false}
+        onLike={() => selectedActivity && handleLike(selectedActivity.id)}
+      />
     </div>
   )
 }
