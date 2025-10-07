@@ -5,7 +5,7 @@ import type React from "react"
 import Image from "next/image"
 import { Heart } from "lucide-react"
 import { useEffect, useRef } from "react"
-import type { Activity } from "@/app/page"
+import type { Activity } from "@/components/home-client"
 
 interface TimelineCardProps {
   activity: Activity
@@ -79,7 +79,7 @@ export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observ
           {activity.title}
         </h2>
         <p className={`leading-relaxed text-foreground/90 ${isCompact ? "text-sm" : "text-sm"}`}>
-          {activity.whatWeTried}
+          {activity.description}
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-1.5">

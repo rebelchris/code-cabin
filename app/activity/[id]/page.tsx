@@ -3,6 +3,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import type { Activity } from "@/app/page"
+import {getPostBySlug} from "@/lib/markdown";
+import markdownToHtml from "@/lib/markdownToHtml";
 
 // This would typically come from a database or CMS
 const activities: Activity[] = [
@@ -110,8 +112,9 @@ export async function generateStaticParams() {
   }))
 }
 
-export default function ActivityPage({ params }: { params: { id: string } }) {
-  const activity = activities.find((a) => a.id === params.id)
+export default async function ActivityPage({ params }: { params: { id: string } }) {
+  const activity = getPostBySlug('the-kindest-thing-i-did-was-let-someone-go.mdx')
+  const content = await markdownToHtml(activity.content || "");
 
   if (!activity) {
     notFound()
@@ -139,11 +142,7 @@ export default function ActivityPage({ params }: { params: { id: string } }) {
       <article className="mx-auto max-w-4xl px-6 py-12">
         {/* Header */}
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <span className="font-medium">{activity.age}</span>
-          <span>•</span>
           <span>{activity.date}</span>
-          <span>•</span>
-          <span className="italic">{activity.timeInvestment}</span>
         </div>
 
         <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-5xl text-balance">
@@ -162,26 +161,11 @@ export default function ActivityPage({ params }: { params: { id: string } }) {
         )}
 
         {/* Sections */}
-        <div className="mt-12 space-y-8">
-          <section>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-accent">What we tried</h2>
-            <p className="mt-3 text-lg leading-relaxed text-foreground">{activity.whatWeTried}</p>
-          </section>
-
-          <section>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-accent">What happened</h2>
-            <p className="mt-3 text-lg leading-relaxed text-foreground">{activity.whatHappened}</p>
-          </section>
-
-          <section>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-accent">Why it worked</h2>
-            <p className="mt-3 text-lg leading-relaxed text-foreground">{activity.whyItWorked}</p>
-          </section>
-
-          <section className="rounded-xl bg-accent/5 p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-accent">The lesson</h2>
-            <p className="mt-3 text-lg leading-relaxed text-foreground">{activity.theLesson}</p>
-          </section>
+        <div className="mt-6 space-y-5">
+          <div
+              className='prose'
+              dangerouslySetInnerHTML={{ __html: content }}
+          />
         </div>
       </article>
 

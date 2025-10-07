@@ -7,6 +7,7 @@ import { ActivityModal } from "@/components/activity-modal"
 export interface Activity {
   id: string
   title: string
+  description: string
   age: string
   date: string
   timeInvestment: string
@@ -19,6 +20,7 @@ export interface Activity {
   type: "leadership" | "process" | "team-building"
   ageMonths: number
   timestamp: string
+  contentHtml?: string
 }
 
 export default function HomeClient({ initialActivities }: { initialActivities: Activity[] }) {
@@ -165,54 +167,6 @@ export default function HomeClient({ initialActivities }: { initialActivities: A
                   >
                     <span>team-building</span>
                     <span className="text-xs opacity-70">{typeCounts["team-building"]}</span>
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Experience
-                </h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedAge(null)}
-                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
-                      selectedAge === null
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    All levels
-                  </button>
-                  <button
-                    onClick={() => setSelectedAge("24-36")}
-                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
-                      selectedAge === "24-36"
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    2-3 years
-                  </button>
-                  <button
-                    onClick={() => setSelectedAge("36-48")}
-                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
-                      selectedAge === "36-48"
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    3-4 years
-                  </button>
-                  <button
-                    onClick={() => setSelectedAge("48-72")}
-                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
-                      selectedAge === "48-72"
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    4-6 years
                   </button>
                 </div>
               </div>

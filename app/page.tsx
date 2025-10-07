@@ -1,18 +1,21 @@
 import { getAllPosts } from "@/lib/markdown"
 import HomeClient, { type Activity } from "@/components/home-client"
+import markdownToHtml from "@/lib/markdownToHtml";
 
 export default async function Home() {
   const posts = getAllPosts()
 
-  const activities: Activity[] = posts.map((post: any) => {
-    const dateString: string = post.date ?? ""
-    const timestamp = dateString ? new Date(dateString).toISOString() : new Date(0).toISOString()
-    const allowedTypes = ["leadership", "process", "team-building"] as const
-    const type = allowedTypes.includes(post.type) ? (post.type as Activity["type"]) : ("process" as Activity["type"]) 
+  const activities: Activity[] = await Promise.all(posts.map(async (post: any) => {
 
+    const dateString: string = post.date ?? ""
+    const timestamp = dateString ? new Date(dateString) : new Date()
+    const allowedTypes = ["leadership", "process", "team-building"] as const
+    const type = allowedTypes.includes(post.type) ? (post.type as Activity["type"]) : ("process" as Activity["type"])
+    const contentHtml = await markdownToHtml(post.content || "")
     return {
       id: post.slug ?? post.title ?? Math.random().toString(36).slice(2),
       title: post.title ?? post.slug ?? "Untitled",
+      description: post.description ?? '',
       age: post.age ?? "",
       date: dateString,
       timeInvestment: post.timeInvestment ?? "",
@@ -24,9 +27,10 @@ export default async function Home() {
       tags: Array.isArray(post.tags) ? post.tags : [],
       type,
       ageMonths: typeof post.ageMonths === "number" ? post.ageMonths : 0,
-      timestamp: new Date(),
+      timestamp: timestamp,
+      contentHtml,
     }
-  })
+  }))
 
   return <HomeClient initialActivities={activities} />
 }

@@ -3,8 +3,8 @@
 import { useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { X, Heart, MessageCircle } from "lucide-react"
-import type { Activity } from "@/app/page"
+import { X, Heart } from "lucide-react"
+import type { Activity } from "@/components/home-client"
 
 interface ActivityModalProps {
   activity: Activity | null
@@ -13,30 +13,6 @@ interface ActivityModalProps {
   isLiked: boolean
   onLike: () => void
 }
-
-const mockComments = [
-  {
-    id: 1,
-    author: "Sarah M.",
-    avatar: "👩‍💼",
-    text: "This is exactly what we needed. Implemented this with my team and saw immediate results. Thanks for sharing!",
-    time: "2 days ago",
-  },
-  {
-    id: 2,
-    author: "Mike R.",
-    avatar: "👨‍💻",
-    text: "Love this approach. Going to try this with my engineering team next sprint.",
-    time: "3 days ago",
-  },
-  {
-    id: 3,
-    author: "Emma L.",
-    avatar: "👩‍💼",
-    text: "The lesson at the end really resonates. Sometimes it's all about changing perspective!",
-    time: "5 days ago",
-  },
-]
 
 export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: ActivityModalProps) {
   useEffect(() => {
@@ -70,7 +46,7 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
           className="absolute right-4 top-4 z-10 rounded-full bg-background/80 p-2 backdrop-blur-sm transition-colors hover:bg-accent hover:text-accent-foreground"
           aria-label="Close modal"
         >
-          <X className="h-5 w-5" />
+          <X className="size-5" />
         </button>
 
         <div className="max-h-[85vh] overflow-y-auto">
@@ -85,11 +61,7 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
           <div className="p-6 lg:p-8">
             {/* Header */}
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <span className="font-medium">{activity.age}</span>
-              <span>•</span>
               <span>{activity.date}</span>
-              <span>•</span>
-              <span className="italic">{activity.timeInvestment}</span>
             </div>
 
             <h1 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground lg:text-3xl">
@@ -122,56 +94,17 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
                 <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
                 <span>{likes}</span>
               </button>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MessageCircle className="h-4 w-4" />
-                <span>{mockComments.length} comments</span>
-              </div>
             </div>
 
             {/* Sections */}
             <div className="mt-6 space-y-5">
-              <section>
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-accent">What we tried</h2>
-                <p className="mt-2 leading-relaxed text-foreground">{activity.whatWeTried}</p>
-              </section>
-
-              <section>
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-accent">What happened</h2>
-                <p className="mt-2 leading-relaxed text-foreground">{activity.whatHappened}</p>
-              </section>
-
-              <section>
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-accent">Why it worked</h2>
-                <p className="mt-2 leading-relaxed text-foreground">{activity.whyItWorked}</p>
-              </section>
-
-              <section className="rounded-lg bg-gradient-to-r from-accent/5 to-accent/10 p-4">
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-accent">The lesson</h2>
-                <p className="mt-2 leading-relaxed text-foreground">{activity.theLesson}</p>
-              </section>
-            </div>
-
-            <div className="mt-8 border-t border-border/50 pt-6">
-              <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-foreground">
-                <MessageCircle className="h-4 w-4" />
-                Comments ({mockComments.length})
-              </h3>
-              <div className="space-y-4">
-                {mockComments.map((comment) => (
-                  <div key={comment.id} className="flex gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/10 text-sm">
-                      {comment.avatar}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-foreground">{comment.author}</span>
-                        <span className="text-xs text-muted-foreground">{comment.time}</span>
-                      </div>
-                      <p className="mt-1 text-sm leading-relaxed text-foreground/90">{comment.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {activity.contentHtml ? (
+                <div className="prose" dangerouslySetInnerHTML={{ __html: activity.contentHtml }} />
+              ) : (
+                <section>
+                  {activity.description}
+                </section>
+              )}
             </div>
 
             {/* Link to full page for SEO */}
