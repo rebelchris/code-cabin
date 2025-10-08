@@ -6,6 +6,7 @@ import Image from "next/image"
 import { Heart } from "lucide-react"
 import { useEffect, useRef } from "react"
 import type { Activity } from "@/components/home-client"
+import { getCategoryColor } from "@/lib/category-colors"
 
 interface TimelineCardProps {
   activity: Activity
@@ -45,7 +46,6 @@ export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observ
     return `${Math.floor(diffInDays / 365)} years ago`
   }
 
-  const hasImage = activity.image && Math.random() > 0.3 // 70% chance to show image
   const isCompact = activity.whatWeTried.length < 150 // Short posts are more compact
 
   return (
@@ -67,7 +67,7 @@ export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observ
             </div>
           </div>
         </div>
-        <span className="text-xs text-muted-foreground">{getRelativeTime(activity.timestamp)}</span>
+        <span className="text-xs text-muted-foreground">{getRelativeTime(new Date(activity.timestamp))}</span>
       </div>
 
       <div onClick={onClick}>
@@ -84,15 +84,9 @@ export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observ
 
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
           <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              activity.type === "leadership"
-                ? "bg-gradient-to-r from-blue-500/10 to-blue-400/10 text-blue-600 dark:text-blue-400"
-                : activity.type === "process"
-                  ? "bg-gradient-to-r from-green-500/10 to-green-400/10 text-green-600 dark:text-green-400"
-                  : "bg-gradient-to-r from-purple-500/10 to-purple-400/10 text-purple-600 dark:text-purple-400"
-            }`}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${getCategoryColor(activity.category).bg} ${getCategoryColor(activity.category).text}`}
           >
-            {activity.type}
+            {activity.category}
           </span>
           {activity.tags?.slice(0, 2).map((tag) => (
             <span key={tag} className="rounded-full bg-muted/50 px-2.5 py-0.5 text-xs text-muted-foreground">
@@ -101,7 +95,7 @@ export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observ
           ))}
         </div>
 
-        {hasImage && activity.image && (
+        {activity.image && (
           <div className="mt-3 overflow-hidden rounded-lg border border-border/50">
             <div className="relative aspect-video bg-muted">
               <Image
@@ -134,7 +128,7 @@ export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observ
           />
           <span className="font-medium">{likes}</span>
         </button>
-        <span className="text-xs text-muted-foreground">Click to read more</span>
+        <span onClick={onClick} className="text-xs text-muted-foreground">Click to read more</span>
       </div>
     </article>
   )

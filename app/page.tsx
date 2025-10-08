@@ -1,16 +1,15 @@
-import { getAllPosts } from "@/lib/markdown"
+import { getAllPosts, getAllCategories } from "@/lib/markdown"
 import HomeClient, { type Activity } from "@/components/home-client"
 import markdownToHtml from "@/lib/markdownToHtml";
 
 export default async function Home() {
   const posts = getAllPosts()
+  const categories = getAllCategories()
 
   const activities: Activity[] = await Promise.all(posts.map(async (post: any) => {
 
     const dateString: string = post.date ?? ""
-    const timestamp = dateString ? new Date(dateString) : new Date()
-    const allowedTypes = ["leadership", "process", "team-building"] as const
-    const type = allowedTypes.includes(post.type) ? (post.type as Activity["type"]) : ("process" as Activity["type"])
+    const timestamp = dateString ? new Date(dateString).toISOString() : new Date(0).toISOString()
     const contentHtml = await markdownToHtml(post.content || "")
     return {
       id: post.slug ?? post.title ?? Math.random().toString(36).slice(2),
@@ -25,12 +24,11 @@ export default async function Home() {
       theLesson: post.theLesson ?? "",
       image: post.image ?? "",
       tags: Array.isArray(post.tags) ? post.tags : [],
-      type,
-      ageMonths: typeof post.ageMonths === "number" ? post.ageMonths : 0,
+      category: post.category ?? "uncategorized",
       timestamp: timestamp,
       contentHtml,
     }
   }))
 
-  return <HomeClient initialActivities={activities} />
+  return <HomeClient initialActivities={activities} categories={categories} />
 }

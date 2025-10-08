@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { TimelineCard } from "@/components/timeline-card"
 import { ActivityModal } from "@/components/activity-modal"
+import { CategoryFilter, TimeFilter } from "@/components/filter-section"
 
 export interface Activity {
   id: string
@@ -17,18 +18,16 @@ export interface Activity {
   theLesson: string
   image: string
   tags?: string[]
-  type: "leadership" | "process" | "team-building"
-  ageMonths: number
+  category: string
   timestamp: string
   contentHtml?: string
 }
 
-export default function HomeClient({ initialActivities }: { initialActivities: Activity[] }) {
+export default function HomeClient({ initialActivities, categories }: { initialActivities: Activity[]; categories: string[] }) {
   const [activities] = useState<Activity[]>(initialActivities)
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
   const [selectedYear, setSelectedYear] = useState<string | null>(null)
-  const [selectedType, setSelectedType] = useState<string | null>(null)
-  const [selectedAge, setSelectedAge] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [likes, setLikes] = useState<Record<string, number>>({})
   const [likedByUser, setLikedByUser] = useState<Record<string, boolean>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -85,33 +84,27 @@ export default function HomeClient({ initialActivities }: { initialActivities: A
         if (selectedYear && new Date(activity.timestamp).getFullYear() !== Number.parseInt(selectedYear)) {
           return false
         }
-        if (selectedType && activity.type !== selectedType) {
+        if (selectedCategory && activity.category !== selectedCategory) {
           return false
-        }
-        if (selectedAge) {
-          const [min, max] = selectedAge.split("-").map(Number)
-          if (activity.ageMonths < min || activity.ageMonths > max) {
-            return false
-          }
         }
         return true
       })
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-  }, [activities, selectedYear, selectedType, selectedAge])
+  }, [activities, selectedYear, selectedCategory])
 
-  const typeCounts = useMemo(() => {
-    const counts = { all: activities.length, leadership: 0, process: 0, "team-building": 0 as number }
-    activities.forEach((a) => {
-      counts[a.type as keyof typeof counts]++
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: activities.length }
+    categories.forEach((category) => {
+      counts[category] = activities.filter((a) => a.category === category).length
     })
     return counts
-  }, [activities])
+  }, [activities, categories])
 
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">
         <div className="mx-auto mb-8 max-w-6xl text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">codecabin.dev</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">Code Cabin</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Lessons from the engineering management trenches - real experiments, honest outcomes
           </p>
@@ -121,84 +114,19 @@ export default function HomeClient({ initialActivities }: { initialActivities: A
           {/* Sidebar - hidden on mobile, shown on lg+ */}
           <aside className="hidden w-64 shrink-0 lg:block">
             <div className="sticky top-6 space-y-6 rounded-2xl border border-border/50 bg-background/95 p-4 shadow-lg backdrop-blur-md">
-              <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Category</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedType(null)}
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
-                      selectedType === null
-                        ? "bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-md"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span>all</span>
-                    <span className="text-xs opacity-70">{typeCounts.all}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedType("leadership")}
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
-                      selectedType === "leadership"
-                        ? "bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span>leadership</span>
-                    <span className="text-xs opacity-70">{typeCounts.leadership}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedType("process")}
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
-                      selectedType === "process"
-                        ? "bg-gradient-to-r from-green-500 to-green-400 text-white shadow-md"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span>process</span>
-                    <span className="text-xs opacity-70">{typeCounts.process}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedType("team-building")}
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
-                      selectedType === "team-building"
-                        ? "bg-gradient-to-r from-purple-500 to-purple-400 text-white shadow-md"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span>team-building</span>
-                    <span className="text-xs opacity-70">{typeCounts["team-building"]}</span>
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Time</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedYear(null)}
-                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
-                      selectedYear === null
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    All time
-                  </button>
-                  {years.map((year) => (
-                    <button
-                      key={year}
-                      onClick={() => setSelectedYear(year.toString())}
-                      className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all ${
-                        selectedYear === year.toString()
-                          ? "bg-accent/20 text-accent"
-                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {year}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                categoryCounts={categoryCounts}
+                variant="desktop"
+              />
+              <TimeFilter
+                years={years}
+                selectedYear={selectedYear}
+                onYearChange={setSelectedYear}
+                variant="desktop"
+              />
             </div>
           </aside>
 
@@ -206,130 +134,21 @@ export default function HomeClient({ initialActivities }: { initialActivities: A
           <div className="min-w-0 flex-1 lg:max-w-md">
             <div className="mb-6 rounded-2xl border border-border/50 bg-background/95 p-4 shadow-lg backdrop-blur-md lg:hidden">
               <div className="mb-4">
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Category</h3>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setSelectedType(null)}
-                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedType === null
-                        ? "bg-gradient-to-r from-accent to-accent/80 text-accent-foreground shadow-md"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span>all</span>
-                    <span className="text-xs opacity-70">{typeCounts.all}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedType("leadership")}
-                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedType === "leadership"
-                        ? "bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-md"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span>leadership</span>
-                    <span className="text-xs opacity-70">{typeCounts.leadership}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedType("process")}
-                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedType === "process"
-                        ? "bg-gradient-to-r from-green-500 to-green-400 text-white shadow-md"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span>process</span>
-                    <span className="text-xs opacity-70">{typeCounts.process}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedType("team-building")}
-                    className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedType === "team-building"
-                        ? "bg-gradient-to-r from-purple-500 to-purple-400 text-white shadow-md"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <span>team-building</span>
-                    <span className="text-xs opacity-70">{typeCounts["team-building"]}</span>
-                  </button>
-                </div>
+                <CategoryFilter
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  onCategoryChange={setSelectedCategory}
+                  categoryCounts={categoryCounts}
+                  variant="mobile"
+                />
               </div>
-
-              <div className="mb-4">
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Experience
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setSelectedAge(null)}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedAge === null
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    All levels
-                  </button>
-                  <button
-                    onClick={() => setSelectedAge("24-36")}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedAge === "24-36"
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    2-3 years
-                  </button>
-                  <button
-                    onClick={() => setSelectedAge("36-48")}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedAge === "36-48"
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    3-4 years
-                  </button>
-                  <button
-                    onClick={() => setSelectedAge("48-72")}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedAge === "48-72"
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    4-6 years
-                  </button>
-                </div>
-              </div>
-
               <div>
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Time</h3>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setSelectedYear(null)}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedYear === null
-                        ? "bg-accent/20 text-accent"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    All time
-                  </button>
-                  {years.map((year) => (
-                    <button
-                      key={year}
-                      onClick={() => setSelectedYear(year.toString())}
-                      className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                        selectedYear === year.toString()
-                          ? "bg-accent/20 text-accent"
-                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {year}
-                    </button>
-                  ))}
-                </div>
+                <TimeFilter
+                  years={years}
+                  selectedYear={selectedYear}
+                  onYearChange={setSelectedYear}
+                  variant="mobile"
+                />
               </div>
             </div>
 

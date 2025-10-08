@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { X, Heart } from "lucide-react"
 import type { Activity } from "@/components/home-client"
+import { getCategoryColor } from "@/lib/category-colors"
 
 interface ActivityModalProps {
   activity: Activity | null
@@ -68,19 +69,22 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
               {activity.title}
             </h1>
 
-            {/* Tags */}
-            {activity.tags && activity.tags.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {activity.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-gradient-to-r from-accent/10 to-accent/5 px-3 py-1 text-sm font-medium text-accent"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
+            {/* Category and Tags */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span
+                className={`rounded-full px-3 py-1 text-sm font-medium ${getCategoryColor(activity.category).bg} ${getCategoryColor(activity.category).text}`}
+              >
+                {activity.category}
+              </span>
+              {activity.tags && activity.tags.length > 0 && activity.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-gradient-to-r from-accent/10 to-accent/5 px-3 py-1 text-sm font-medium text-accent"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
 
             <div className="mt-4 flex items-center gap-3">
               <button
@@ -109,7 +113,7 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
 
             {/* Link to full page for SEO */}
             <div className="mt-6 border-t border-border/50 pt-4">
-              <Link href={`/activity/${activity.id}`} className="text-sm text-accent hover:underline">
+              <Link href={`/post/${activity.id}`} className="text-sm text-accent hover:underline">
                 View full page →
               </Link>
             </div>
