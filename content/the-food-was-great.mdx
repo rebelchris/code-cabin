@@ -1,0 +1,155 @@
+---
+title: "The \"Food Was Great\" Lie: Why We Can't Give Honest Feedback"
+category: "communication"
+date: "2025-10-08"
+readTime: "5 min read"
+description: "The Restaurant Lie: The bizarre reason you can't give honest feedback (and why your team is suffering). The 'Food Was Great' lie doesn't just happen to waitresses. It's happening in every code review. This is about the social friction that makes us choose comfort over continuous improvement, and the simple framework I use to break the cycle."
+slug: "the-food-was-great"
+---
+
+"How was everything?"
+
+"Great, thanks!"
+
+You smile. The waitress walks away. And you know you just lied.
+
+The food wasn't great. It was fine. Maybe even below average. The pasta was overcooked. The sauce was bland. But when she asked, something in your brain auto-piloted to "great" and you couldn't stop it.
+
+We've all done this. And we do the exact same thing in code reviews, design critiques, and performance conversations.
+
+## The Restaurant Metaphor
+
+Think about it: If you actually said "the pasta was overcooked and the sauce needs more salt," you'd be doing them a favor. The chef could improve. Future diners would have a better experience. You'd get better food next time you visit.
+
+But instead you say "great" and leave a mediocre tip. The restaurant never learns. The chef keeps overcooking pasta. Everyone loses.
+
+Now replace "restaurant" with "pull request" and "pasta" with "code."
+
+Same dynamic. Same waste.
+
+## Why Honesty Is So Hard
+
+**1. We conflate feedback with judgment**
+
+When you say "this code could be better," the other person hears "you're not good enough." Even though that's not what you meant. Even though you're trying to help.
+
+We've been trained since childhood that criticism = attack. Pointing out flaws = being mean. So we default to nice instead of honest.
+
+**2. We're conflict-averse**
+
+Honesty creates friction. Even small friction. And most of us will do anything to avoid friction.
+
+It's easier to approve the PR and move on than to write "this function is doing too many things." It's easier to say "looks good" than "I don't understand what this variable name means."
+
+**3. We don't want to be "that person"**
+
+You know who I mean. The person who always has comments. The person who nitpicks. The person who makes every code review take three rounds.
+
+Nobody wants to be that person. So we stay quiet. We approve things that are "good enough" even when we see clear ways to make them better.
+
+## The Cost of Dishonest Feedback
+
+Here's what happens when we default to "great, thanks":
+
+**The code doesn't improve.** That confusing function stays confusing. That weird abstraction stays weird. Technical debt accumulates because nobody wants to be the one to say "this isn't quite right."
+
+**People don't learn.** If you never tell the junior dev that their naming is unclear, they'll keep writing unclear names. If you never mention that the component could be simpler, they'll keep building complex components.
+
+**Standards erode.** When you approve mediocre work without comment, you're setting a new baseline. Soon "mediocre" becomes "normal" becomes "acceptable."
+
+**You lose credibility.** When you say everything is "great," your feedback becomes meaningless. The one time you actually do push back, nobody takes it seriously because you've cried wolf with niceness for so long.
+
+## What Changed My Approach
+
+After years of defaulting to "looks good," I've adopted a simpler framework:
+
+**Separate observations from requirements:**
+
+- **Blocking:** "This will break production" / "This violates our security policy"
+- **Strong suggestion:** "This will be hard to maintain" / "This approach has a simpler alternative"
+- **Optional:** "This could be more idiomatic" / "Consider renaming for clarity"
+
+**Be specific, not vague:**
+- ❌ "This could be better"
+- ✅ "This function is doing both validation and business logic. Consider splitting it."
+
+**Explain the why:**
+- ❌ "Use a different pattern here"
+- ✅ "This pattern makes testing harder because of the tight coupling. Consider dependency injection instead."
+
+**Acknowledge the good:**
+- Don't only comment on problems
+- "Nice handling of the edge case" goes a long way
+
+Some teams use prefixes like "Nit:" for optional suggestions (you can see this in [Google's code review guidelines](https://google.github.io/eng-practices/review/reviewer/standard.html)). The key is signaling clearly: *this is helpful context, not a demand.*
+
+## The Permission Model
+
+Here's what changed things for me: I stopped waiting for permission to give feedback and started giving permission to ignore it.
+
+Instead of thinking: "Should I mention this variable name is confusing?"
+
+I just write: "Optional: `data2` is a bit cryptic - maybe `processedRecords`?"
+
+The author can take the suggestion, explain their choice, or ignore it entirely. All three outcomes are fine. The important thing is the feedback exists.
+
+And you know what? Nobody's offended. Nobody's feelings are hurt. The code is getting better.
+
+Turns out people actually want honest feedback. They just want it delivered with respect and specificity, not vague criticism or fake praise.
+
+## When Honesty Actually Matters
+
+Some people will say "not everything needs to be perfect" or "we need to ship, not polish."
+
+They're right. But they're solving the wrong problem.
+
+Honest feedback isn't about perfection. It's about:
+
+- **Preventing future pain** - That confusing code will bite someone later
+- **Teaching moments** - Junior devs won't learn if we stay silent
+- **Compound improvements** - Small fixes add up over time
+- **Maintaining standards** - "Good enough" slowly becomes "barely acceptable"
+
+The goal isn't perfection. It's continuous improvement.
+
+## The Restaurant Redux
+
+Back to the restaurant. What if we treated code reviews like this:
+
+**Waitress:** "How was everything?"
+
+**You:** "The flavors were good, but the pasta was a bit overcooked. I'd love to come back if you can nail the texture next time."
+
+**Waitress:** "Thanks for letting us know! I'll mention it to the chef."
+
+Honest. Specific. Helpful. Nobody's feelings are hurt. The restaurant improves.
+
+Now imagine code reviews:
+
+**You:** "The logic is solid, but the function is doing too many things. Consider extracting the validation into a separate function. I'd approve after that change."
+
+**Author:** "Good catch, makes sense. Updated."
+
+Same energy. Same outcome. Better code.
+
+## The Hard Truth
+
+We stay silent because honesty is uncomfortable. We approve mediocre work because "good enough" is easier than "here's how to make it better."
+
+But every time we default to "looks good" when it doesn't, we're choosing short-term comfort over long-term improvement.
+
+The restaurant never improves if you keep saying the food is great.
+
+Your codebase never improves if you keep approving PRs without real feedback.
+
+Your team never improves if you keep pretending average is excellent.
+
+---
+
+The food wasn't great. The pasta was overcooked.
+
+And once we can say that out loud, we can actually fix it.
+
+---
+
+*What's your "food was great" moment? When have you stayed silent in a code review when you should have spoken up?*
