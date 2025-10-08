@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { TimelineCard } from "@/components/timeline-card"
-import { ActivityModal } from "@/components/activity-modal"
+import { PostModal } from "@/components/post-modal"
 import { CategoryFilter, TimeFilter } from "@/components/filter-section"
 
-export interface Activity {
+export interface PostView {
   id: string
   title: string
   description: string
@@ -23,9 +23,9 @@ export interface Activity {
   contentHtml?: string
 }
 
-export default function HomeClient({ initialActivities, categories }: { initialActivities: Activity[]; categories: string[] }) {
-  const [activities] = useState<Activity[]>(initialActivities)
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+export default function HomeClient({ initialPosts, categories }: { initialPosts: PostView[]; categories: string[] }) {
+  const [posts] = useState<PostView[]>(initialPosts)
+  const [selectedPost, setSelectedPost] = useState<PostView | null>(null)
   const [selectedYear, setSelectedYear] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [likes, setLikes] = useState<Record<string, number>>({})
@@ -35,13 +35,13 @@ export default function HomeClient({ initialActivities, categories }: { initialA
   useEffect(() => {
     const initialLikes: Record<string, number> = {}
     const initialLikedByUser: Record<string, boolean> = {}
-    activities.forEach((activity) => {
-      initialLikes[activity.id] = Math.floor(Math.random() * 50) + 15
-      initialLikedByUser[activity.id] = false
+    posts.forEach((post) => {
+      initialLikes[post.id] = Math.floor(Math.random() * 50) + 15
+      initialLikedByUser[post.id] = false
     })
     setLikes(initialLikes)
     setLikedByUser(initialLikedByUser)
-  }, [activities])
+  }, [posts])
 
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
@@ -62,43 +62,43 @@ export default function HomeClient({ initialActivities, categories }: { initialA
     }
   }, [])
 
-  const handleLike = (activityId: string) => {
+  const handleLike = (postId: string) => {
     setLikedByUser((prev) => ({
       ...prev,
-      [activityId]: !prev[activityId],
+      [postId]: !prev[postId],
     }))
     setLikes((prev) => ({
       ...prev,
-      [activityId]: prev[activityId] + (likedByUser[activityId] ? -1 : 1),
+      [postId]: prev[postId] + (likedByUser[postId] ? -1 : 1),
     }))
   }
 
   const years = useMemo(() => {
-    const yearSet = new Set(activities.map((a) => new Date(a.timestamp).getFullYear()))
+    const yearSet = new Set(posts.map((a) => new Date(a.timestamp).getFullYear()))
     return Array.from(yearSet).sort((a, b) => b - a)
-  }, [activities])
+  }, [posts])
 
-  const filteredActivities = useMemo(() => {
-    return activities
-      .filter((activity) => {
-        if (selectedYear && new Date(activity.timestamp).getFullYear() !== Number.parseInt(selectedYear)) {
+  const filteredPosts = useMemo(() => {
+    return posts
+      .filter((post) => {
+        if (selectedYear && new Date(post.timestamp).getFullYear() !== Number.parseInt(selectedYear)) {
           return false
         }
-        if (selectedCategory && activity.category !== selectedCategory) {
+        if (selectedCategory && post.category !== selectedCategory) {
           return false
         }
         return true
       })
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-  }, [activities, selectedYear, selectedCategory])
+  }, [posts, selectedYear, selectedCategory])
 
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: activities.length }
+    const counts: Record<string, number> = { all: posts.length }
     categories.forEach((category) => {
-      counts[category] = activities.filter((a) => a.category === category).length
+      counts[category] = posts.filter((a) => a.category === category).length
     })
     return counts
-  }, [activities, categories])
+  }, [posts, categories])
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -154,25 +154,25 @@ export default function HomeClient({ initialActivities, categories }: { initialA
 
             <div className="mb-4 text-center">
               <p className="text-sm text-muted-foreground">
-                {filteredActivities.length} {filteredActivities.length === 1 ? "post" : "posts"}
+                {filteredPosts.length} {filteredPosts.length === 1 ? "post" : "posts"}
               </p>
             </div>
 
             <div className="space-y-4">
-              {filteredActivities.map((activity, index) => (
+              {filteredPosts.map((post, index) => (
                 <TimelineCard
-                  key={activity.id}
-                  activity={activity}
-                  onClick={() => setSelectedActivity(activity)}
-                  onLike={() => handleLike(activity.id)}
-                  likes={likes[activity.id] || 0}
-                  isLiked={likedByUser[activity.id] || false}
+                  key={post.id}
+                  post={post}
+                  onClick={() => setSelectedPost(post)}
+                  onLike={() => handleLike(post.id)}
+                  likes={likes[post.id] || 0}
+                  isLiked={likedByUser[post.id] || false}
                   observerRef={observerRef}
                   index={index}
                 />
               ))}
 
-              {filteredActivities.length === 0 && (
+              {filteredPosts.length === 0 && (
                 <div className="py-12 text-center">
                   <p className="text-sm text-muted-foreground">No posts found with the selected filters.</p>
                 </div>
@@ -183,12 +183,12 @@ export default function HomeClient({ initialActivities, categories }: { initialA
       </main>
 
 
-      <ActivityModal
-        activity={selectedActivity}
-        onClose={() => setSelectedActivity(null)}
-        likes={selectedActivity ? likes[selectedActivity.id] || 0 : 0}
-        isLiked={selectedActivity ? likedByUser[selectedActivity.id] || false : false}
-        onLike={() => selectedActivity && handleLike(selectedActivity.id)}
+      <PostModal
+        post={selectedPost}
+        onClose={() => setSelectedPost(null)}
+        likes={selectedPost ? likes[selectedPost.id] || 0 : 0}
+        isLiked={selectedPost ? likedByUser[selectedPost.id] || false : false}
+        onLike={() => selectedPost && handleLike(selectedPost.id)}
       />
     </div>
   )

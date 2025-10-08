@@ -5,11 +5,12 @@ import type React from "react"
 import Image from "next/image"
 import { Heart } from "lucide-react"
 import { useEffect, useRef } from "react"
-import type { Activity } from "@/components/home-client"
+import type { PostView } from "@/lib/types"
 import { getCategoryColor } from "@/lib/category-colors"
+import { getRelativeTimeFromIso } from "@/lib/date"
 
 interface TimelineCardProps {
-  activity: Activity
+  post: PostView
   onClick: () => void
   onLike: () => void
   likes: number
@@ -18,35 +19,21 @@ interface TimelineCardProps {
   index: number
 }
 
-export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observerRef, index }: TimelineCardProps) {
+export function TimelineCard({ post, onClick, onLike, likes, isLiked, observerRef, index }: TimelineCardProps) {
   const cardRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const currentCard = cardRef.current
-    if (currentCard && observerRef.current) {
-      observerRef.current.observe(currentCard)
-    }
+    if (!cardRef.current || !observerRef.current) return
+    observerRef.current.observe(cardRef.current)
     return () => {
-      if (currentCard && observerRef.current) {
-        observerRef.current.unobserve(currentCard)
-      }
+      if (!cardRef.current || !observerRef.current) return
+      observerRef.current.unobserve(cardRef.current)
     }
   }, [observerRef])
 
-  const getRelativeTime = (date: Date) => {
-    const now = new Date()
-    const diffInMs = now.getTime() - date.getTime()
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+  const categoryColor = getCategoryColor(post.category)
 
-    if (diffInDays === 0) return "today"
-    if (diffInDays === 1) return "1 day ago"
-    if (diffInDays < 7) return `${diffInDays} days ago`
-    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`
-    if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`
-    return `${Math.floor(diffInDays / 365)} years ago`
-  }
-
-  const isCompact = activity.whatWeTried.length < 150 // Short posts are more compact
+  const isCompact = post.whatWeTried.length < 150 // Short posts are more compact
 
   return (
     <article
@@ -62,12 +49,10 @@ export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observ
           <div>
             <div className="flex items-center gap-1.5 text-xs">
               <span className="font-medium text-foreground">Engineering Manager</span>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">{activity.age}</span>
             </div>
           </div>
         </div>
-        <span className="text-xs text-muted-foreground">{getRelativeTime(new Date(activity.timestamp))}</span>
+        <span className="text-xs text-muted-foreground">{getRelativeTimeFromIso(post.timestamp)}</span>
       </div>
 
       <div onClick={onClick}>
@@ -76,31 +61,31 @@ export function TimelineCard({ activity, onClick, onLike, likes, isLiked, observ
             isCompact ? "mb-2 text-base" : "mb-2 text-lg"
           }`}
         >
-          {activity.title}
+          {post.title}
         </h2>
         <p className={`leading-relaxed text-foreground/90 ${isCompact ? "text-sm" : "text-sm"}`}>
-          {activity.description}
+          {post.description}
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
           <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${getCategoryColor(activity.category).bg} ${getCategoryColor(activity.category).text}`}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${categoryColor.bg} ${categoryColor.text}`}
           >
-            {activity.category}
+            {post.category}
           </span>
-          {activity.tags?.slice(0, 2).map((tag) => (
+          {post.tags?.slice(0, 2).map((tag) => (
             <span key={tag} className="rounded-full bg-muted/50 px-2.5 py-0.5 text-xs text-muted-foreground">
               {tag}
             </span>
           ))}
         </div>
 
-        {activity.image && (
+        {post.image && (
           <div className="mt-3 overflow-hidden rounded-lg border border-border/50">
             <div className="relative aspect-video bg-muted">
               <Image
-                src={activity.image || "/placeholder.svg"}
-                alt={activity.title}
+                src={post.image || "/placeholder.svg"}
+                alt={post.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
               />

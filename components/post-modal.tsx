@@ -4,23 +4,22 @@ import { useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { X, Heart } from "lucide-react"
-import type { Activity } from "@/components/home-client"
-import { getCategoryColor } from "@/lib/category-colors"
+import type { PostView } from "@/lib/types"
 
-interface ActivityModalProps {
-  activity: Activity | null
+interface PostModalProps {
+  post: PostView | null
   onClose: () => void
   likes: number
   isLiked: boolean
   onLike: () => void
 }
 
-export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: ActivityModalProps) {
+export function PostModal({ post, onClose, likes, isLiked, onLike }: PostModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
     }
-    if (activity) {
+    if (post) {
       document.addEventListener("keydown", handleEscape)
       document.body.style.overflow = "hidden"
     }
@@ -28,9 +27,9 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
       document.removeEventListener("keydown", handleEscape)
       document.body.style.overflow = "unset"
     }
-  }, [activity, onClose])
+  }, [post, onClose])
 
-  if (!activity) return null
+  if (!post) return null
 
   return (
     <div
@@ -52,9 +51,9 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
 
         <div className="max-h-[85vh] overflow-y-auto">
           {/* Image - optional */}
-          {activity.image && (
+          {post.image && (
             <div className="relative aspect-[16/9] overflow-hidden bg-muted">
-              <Image src={activity.image || "/placeholder.svg"} alt={activity.title} fill className="object-cover" />
+              <Image src={post.image || "/placeholder.svg"} alt={post.title} fill className="object-cover" />
             </div>
           )}
 
@@ -62,21 +61,16 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
           <div className="p-6 lg:p-8">
             {/* Header */}
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <span>{activity.date}</span>
+              <span>{post.date}</span>
             </div>
 
             <h1 className="mt-3 text-balance text-2xl font-semibold tracking-tight text-foreground lg:text-3xl">
-              {activity.title}
+              {post.title}
             </h1>
 
             {/* Category and Tags */}
             <div className="mt-4 flex flex-wrap gap-2">
-              <span
-                className={`rounded-full px-3 py-1 text-sm font-medium ${getCategoryColor(activity.category).bg} ${getCategoryColor(activity.category).text}`}
-              >
-                {activity.category}
-              </span>
-              {activity.tags && activity.tags.length > 0 && activity.tags.map((tag) => (
+              {post.tags && post.tags.length > 0 && post.tags.map((tag) => (
                 <span
                   key={tag}
                   className="rounded-full bg-gradient-to-r from-accent/10 to-accent/5 px-3 py-1 text-sm font-medium text-accent"
@@ -102,18 +96,18 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
 
             {/* Sections */}
             <div className="mt-6 space-y-5">
-              {activity.contentHtml ? (
-                <div className="prose" dangerouslySetInnerHTML={{ __html: activity.contentHtml }} />
+              {post.contentHtml ? (
+                <div className="prose" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
               ) : (
                 <section>
-                  {activity.description}
+                  {post.description}
                 </section>
               )}
             </div>
 
             {/* Link to full page for SEO */}
             <div className="mt-6 border-t border-border/50 pt-4">
-              <Link href={`/post/${activity.id}`} className="text-sm text-accent hover:underline">
+              <Link href={`/post/${post.id}`} className="text-sm text-accent hover:underline">
                 View full page →
               </Link>
             </div>
@@ -123,3 +117,5 @@ export function ActivityModal({ activity, onClose, likes, isLiked, onLike }: Act
     </div>
   )
 }
+
+
