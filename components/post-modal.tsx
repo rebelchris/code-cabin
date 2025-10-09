@@ -5,16 +5,15 @@ import Image from "next/image"
 import Link from "next/link"
 import { X, Heart } from "lucide-react"
 import type { PostView } from "@/lib/types"
+import LikeButton from "@/components/LikeButton";
+import {getCategoryColor} from "@/lib/category-colors";
 
 interface PostModalProps {
   post: PostView | null
   onClose: () => void
-  likes: number
-  isLiked: boolean
-  onLike: () => void
 }
 
-export function PostModal({ post, onClose, likes, isLiked, onLike }: PostModalProps) {
+export function PostModal({ post, onClose }: PostModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
@@ -69,29 +68,18 @@ export function PostModal({ post, onClose, likes, isLiked, onLike }: PostModalPr
             </h1>
 
             {/* Category and Tags */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              {post.tags && post.tags.length > 0 && post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-gradient-to-r from-accent/10 to-accent/5 px-3 py-1 text-sm font-medium text-accent"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-4 flex items-center gap-3">
-              <button
-                onClick={onLike}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                  isLiked
-                    ? "bg-gradient-to-r from-red-500/10 to-pink-500/10 text-red-600 dark:text-red-400"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                }`}
+            <div className="mt-6 flex flex-wrap gap-2">
+              <LikeButton postId={post.id} />
+              <span
+                  className={`rounded-full px-3 py-1 text-sm font-medium ${getCategoryColor(post.category).bg} ${getCategoryColor(post.category).text}`}
               >
-                <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
-                <span>{likes}</span>
-              </button>
+            {post.category}
+          </span>
+              {post.tags && post.tags.length > 0 && post.tags.map((tag: string) => (
+                  <span key={tag} className="rounded-full bg-accent/10 px-3 py-1 text-sm font-medium text-accent">
+              {tag}
+            </span>
+              ))}
             </div>
 
             {/* Sections */}

@@ -5,10 +5,11 @@ import { ArrowLeft } from "lucide-react"
 import {getPostBySlug, getPostSlugs} from "@/lib/markdown";
 import markdownToHtml from "@/lib/markdownToHtml";
 import { getCategoryColor } from "@/lib/category-colors";
+import LikeButton from "@/components/LikeButton";
 
 export async function generateStaticParams() {
   const slugs = getPostSlugs()
-  
+
   return slugs.map((slug) => ({
     id: slug.replace(/\.mdx?$/, ""), // Remove .mdx or .md extension
   }))
@@ -24,7 +25,7 @@ export default async function PostPage({ params }: { params: { id: string } }) {
 
   // Transform post data to match postData interface
   const postData = {
-    id: post.slug || post.title || "untitled",
+    id: post.slug || post.title || Math.random().toString(36).slice(2),
     title: post.title || "Untitled",
     description: post.description || "",
     age: post.age || "",
@@ -74,6 +75,7 @@ export default async function PostPage({ params }: { params: { id: string } }) {
 
         {/* Category and Tags */}
         <div className="mt-6 flex flex-wrap gap-2">
+          <LikeButton postId={params.id} />
           <span
             className={`rounded-full px-3 py-1 text-sm font-medium ${getCategoryColor(postData.category).bg} ${getCategoryColor(postData.category).text}`}
           >

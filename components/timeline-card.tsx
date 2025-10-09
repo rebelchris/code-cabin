@@ -8,6 +8,7 @@ import { useEffect, useRef } from "react"
 import type { PostView } from "@/lib/types"
 import { getCategoryColor } from "@/lib/category-colors"
 import { getRelativeTimeFromIso } from "@/lib/date"
+import LikeButton from "@/components/LikeButton";
 
 interface TimelineCardProps {
   post: PostView
@@ -95,24 +96,7 @@ export function TimelineCard({ post, onClick, onLike, likes, isLiked, observerRe
       </div>
 
       <div className="mt-3 flex items-center gap-3 border-t border-border/30 pt-3">
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onLike()
-          }}
-          className={`group/like flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-all ${
-            isLiked
-              ? "bg-gradient-to-r from-red-500/10 to-pink-500/10 text-red-600 dark:text-red-400"
-              : "text-muted-foreground hover:bg-muted/50"
-          }`}
-        >
-          <Heart
-            className={`h-4 w-4 transition-all ${
-              isLiked ? "fill-current animate-in zoom-in-50" : "group-hover/like:scale-110"
-            }`}
-          />
-          <span className="font-medium">{likes}</span>
-        </button>
+        <LikeButton postId={post.id} />
         <span onClick={onClick} className="text-xs text-muted-foreground">Click to read more</span>
       </div>
     </article>
