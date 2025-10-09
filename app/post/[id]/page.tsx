@@ -6,6 +6,7 @@ import {getPostBySlug, getPostSlugs} from "@/lib/markdown";
 import markdownToHtml from "@/lib/markdownToHtml";
 import { getCategoryColor } from "@/lib/category-colors";
 import LikeButton from "@/components/LikeButton";
+import {Metadata} from "next";
 
 export async function generateStaticParams() {
   const slugs = getPostSlugs()
@@ -15,7 +16,51 @@ export async function generateStaticParams() {
   }))
 }
 
-export default async function PostPage({ params }: { params: { id: string } }) {
+// Define the Props type for both the component and generateMetadata
+type PostPageProps = {
+  params: { id: string }
+};
+
+export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+  const slug = params.id;
+  const post = getPostBySlug(slug) as any;
+
+  if (!post) {
+    return {};
+  }
+
+  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.codecabin.dev';
+  const canonicalUrl = `${BASE_URL}/post/${slug}`;
+  const description = post.description || `Read the latest post from Code Cabin: ${post.title}.`;
+
+  return {
+    // Essential Metadata
+    title: `${post.title} | Code Cabin`,
+    description: description,
+
+    alternates: {
+      canonical: canonicalUrl,
+    },
+
+    openGraph: {
+      title: post.title,
+      description: description,
+      url: canonicalUrl,
+      type: 'article',
+      siteName: 'Code Cabin',
+      publishedTime: post.date ? new Date(post.date).toISOString() : undefined,
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: description,
+    },
+  };
+}
+
+
+export default async function PostPage({ params }: PostPageProps) {
   const post = getPostBySlug(`${params.id}`) as any
   const content = await markdownToHtml(post.content || "");
 
