@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.codecabin.dev';
   const canonicalUrl = `${BASE_URL}/post/${slug}`;
   const description = post.description || `Read the latest post from Code Cabin: ${post.title}.`;
+  const imageUrl = post.image || `${BASE_URL}/opengraph-image.png`;
 
   return {
     // Essential Metadata
@@ -48,6 +49,10 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       url: canonicalUrl,
       type: 'article',
       siteName: 'Code Cabin',
+      images: [{
+        url: imageUrl,
+        alt: post.title,
+      }],
       publishedTime: post.date ? new Date(post.date).toISOString() : undefined,
     },
 
@@ -55,6 +60,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       card: 'summary_large_image',
       title: post.title,
       description: description,
+      images: [imageUrl],
     },
   };
 }
