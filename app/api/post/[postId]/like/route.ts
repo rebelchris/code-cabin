@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { redis } from '@/lib/redis';
 import { hashIp } from '@/lib/utils';
 
+const IP_TTL = 60 * 60 * 24 * 90; // 90 days in seconds
+
 // Helper to get hashed IP
 const getHashedIp = (req: NextRequest) => {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
@@ -9,9 +11,9 @@ const getHashedIp = (req: NextRequest) => {
 };
 
 // Helper to get Redis keys
-const getKeys = (postId: string) => ({
+const getKeys = (postId: string, hashedIp?: string) => ({
     likes: `post:${postId}:likes`,
-    ips: `post:${postId}:liked_by_ips`
+    ip: hashedIp ? `post:${postId}:${hashedIp}` : undefined
 });
 
 export async function POST(
@@ -19,35 +21,29 @@ export async function POST(
     { params }: { params: { postId: string } }
 ) {
     const client = await redis.use();
-    const { likes, ips } = getKeys(params.postId);
     const hashedIp = getHashedIp(req);
+    const { likes, ip } = getKeys(params.postId, hashedIp);
 
     try {
-        // Check if already liked and get current count in one go
-        const results = await client
-            .multi()
-            .sIsMember(ips, hashedIp)
-            .get(likes)
-            .exec();
+        // Check if this IP has already liked
+        const hasLiked = await client.exists(ip!);
 
-        const hasLiked = results[0] as unknown as number;
-        const currentLikes = results[1] as unknown as string | null;
-
-        if (hasLiked === 1) {
+        if (hasLiked) {
+            const currentLikes = await client.get(likes);
             return NextResponse.json({
                 message: 'Already liked',
                 likes: parseInt(currentLikes || '0', 10)
             }, { status: 409 });
         }
 
-        // Add like atomically
-        const likeResults = await client
+        // Add like: set IP flag with TTL and increment counter
+        const results = await client
             .multi()
-            .sAdd(ips, hashedIp)
+            .set(ip!, '1', { EX: IP_TTL })
             .incr(likes)
             .exec();
 
-        const newLikes = likeResults[1] as unknown as number;
+        const newLikes = results[1] as number;
 
         return NextResponse.json({ message: 'Like added', likes: newLikes });
     } catch (error) {
@@ -61,19 +57,20 @@ export async function GET(
     { params }: { params: { postId: string } }
 ) {
     const client = await redis.use();
-    const { likes, ips } = getKeys(params.postId);
     const checkStatus = req.nextUrl.searchParams.get('checkStatus') === 'true';
+    const hashedIp = checkStatus ? getHashedIp(req) : undefined;
+    const { likes, ip } = getKeys(params.postId, hashedIp);
 
     try {
         const multi = client.multi().get(likes);
 
-        if (checkStatus) {
-            multi.sIsMember(ips, getHashedIp(req));
+        if (checkStatus && ip) {
+            multi.exists(ip);
         }
 
         const results = await multi.exec();
-        const count = parseInt((results[0] as unknown as string | null) || '0', 10);
-        const hasLiked = checkStatus ? (results[1] as unknown as number) === 1 : false;
+        const count = parseInt((results[0] as string | null) || '0', 10);
+        const hasLiked = checkStatus ? (results[1] as number) === 1 : false;
 
         return NextResponse.json({ likes: count, hasLiked });
     } catch (error) {
