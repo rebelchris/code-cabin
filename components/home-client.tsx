@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { TimelineCard } from "@/components/timeline-card"
-import { PostModal } from "@/components/post-modal"
 import { CategoryFilter, TimeFilter } from "@/components/filter-section"
 
 export interface PostView {
@@ -25,7 +24,6 @@ export interface PostView {
 
 export default function HomeClient({ initialPosts, categories }: { initialPosts: PostView[]; categories: string[] }) {
   const [posts] = useState<PostView[]>(initialPosts)
-  const [selectedPost, setSelectedPost] = useState<PostView | null>(null)
   const [selectedYear, setSelectedYear] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [likes, setLikes] = useState<Record<string, number>>({})
@@ -163,7 +161,6 @@ export default function HomeClient({ initialPosts, categories }: { initialPosts:
                 <TimelineCard
                   key={post.id}
                   post={post}
-                  onClick={() => setSelectedPost(post)}
                   onLike={() => handleLike(post.id)}
                   likes={likes[post.id] || 0}
                   isLiked={likedByUser[post.id] || false}
@@ -182,14 +179,6 @@ export default function HomeClient({ initialPosts, categories }: { initialPosts:
         </div>
       </main>
 
-
-      <PostModal
-        post={selectedPost}
-        onClose={() => setSelectedPost(null)}
-        likes={selectedPost ? likes[selectedPost.id] || 0 : 0}
-        isLiked={selectedPost ? likedByUser[selectedPost.id] || false : false}
-        onLike={() => selectedPost && handleLike(selectedPost.id)}
-      />
     </div>
   )
 }

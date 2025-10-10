@@ -1,18 +1,16 @@
 "use client"
 
 import type React from "react"
-
 import Image from "next/image"
-import { Heart } from "lucide-react"
 import { useEffect, useRef } from "react"
 import type { PostView } from "@/lib/types"
+import Link from "next/link"
 import { getCategoryColor } from "@/lib/category-colors"
 import { getRelativeTimeFromIso } from "@/lib/date"
 import LikeButton from "@/components/LikeButton";
 
 interface TimelineCardProps {
   post: PostView
-  onClick: () => void
   onLike: () => void
   likes: number
   isLiked: boolean
@@ -20,7 +18,7 @@ interface TimelineCardProps {
   index: number
 }
 
-export function TimelineCard({ post, onClick, onLike, likes, isLiked, observerRef, index }: TimelineCardProps) {
+export function TimelineCard({ post, onLike, likes, isLiked, observerRef, index }: TimelineCardProps) {
   const cardRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -56,7 +54,7 @@ export function TimelineCard({ post, onClick, onLike, likes, isLiked, observerRe
         <span className="text-xs text-muted-foreground">{getRelativeTimeFromIso(post.timestamp)}</span>
       </div>
 
-      <div onClick={onClick}>
+      <Link href={`/post/${post.id}`} scroll={false}>
         <h2
           className={`font-semibold tracking-tight text-foreground transition-colors group-hover:text-accent ${
             isCompact ? "mb-2 text-base" : "mb-2 text-lg"
@@ -93,11 +91,11 @@ export function TimelineCard({ post, onClick, onLike, likes, isLiked, observerRe
             </div>
           </div>
         )}
-      </div>
+      </Link>
 
       <div className="mt-3 flex items-center gap-3 border-t border-border/30 pt-3">
         <LikeButton postId={post.id} />
-        <span onClick={onClick} className="text-xs text-muted-foreground">Click to read more</span>
+        <Link href={`/post/${post.id}`} scroll={false} className="text-xs text-muted-foreground">Click to read more</Link>
       </div>
     </article>
   )

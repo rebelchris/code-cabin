@@ -56,10 +56,11 @@ export async function GET(
     req: NextRequest,
     { params }: { params: { postId: string } }
 ) {
+    const { postId } = await params;
     const client = await redis.use();
     const checkStatus = req.nextUrl.searchParams.get('checkStatus') === 'true';
     const hashedIp = checkStatus ? getHashedIp(req) : undefined;
-    const { likes, ip } = getKeys(params.postId, hashedIp);
+    const { likes, ip } = getKeys(postId, hashedIp);
 
     try {
         const multi = client.multi().get(likes);
