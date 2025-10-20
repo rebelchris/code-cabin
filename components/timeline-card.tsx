@@ -47,7 +47,7 @@ export function TimelineCard({ post, onLike, likes, isLiked, observerRef, index 
           </div>
           <div>
             <div className="flex items-center gap-1.5 text-xs">
-              <span className="font-medium text-foreground">Engineering Manager</span>
+              <span className="font-medium text-foreground">Chris Bongers</span>
             </div>
           </div>
         </div>
