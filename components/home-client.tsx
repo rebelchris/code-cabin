@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { TimelineCard } from "@/components/timeline-card"
 import { CategoryFilter, TimeFilter } from "@/components/filter-section"
+import { NewsletterSubscribe } from "@/components/newsletter-subscribe"
 
 export interface PostView {
   id: string
@@ -125,6 +126,7 @@ export default function HomeClient({ initialPosts, categories }: { initialPosts:
                 onYearChange={setSelectedYear}
                 variant="desktop"
               />
+              <NewsletterSubscribe variant="compact" />
             </div>
           </aside>
 

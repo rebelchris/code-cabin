@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 import { Suspense } from "react"
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: "Code Cabin - Engineering Management Lessons",
@@ -24,6 +25,7 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <Suspense fallback={null}>{children}</Suspense>
         {modal}
+        <Toaster />
         <Analytics />
         <SpeedInsights />
       </body>

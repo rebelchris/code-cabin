@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { MetaBlock } from './MetaBlock'
+import { NewsletterSubscribe } from './newsletter-subscribe'
 
 type PostArticleProps = {
   postId: string
@@ -32,6 +33,13 @@ export function PostArticle({ postId, title, date, image, category, tags = [], c
 
       <div className="mt-6 space-y-5">
         <div className='prose' dangerouslySetInnerHTML={{ __html: contentHtml }} />
+      </div>
+
+      {/* Newsletter subscription */}
+      <div className="mt-12 flex justify-center">
+        <div className="w-full max-w-md">
+          <NewsletterSubscribe variant="compact" />
+        </div>
       </div>
     </article>
   )
