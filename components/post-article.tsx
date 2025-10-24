@@ -1,6 +1,10 @@
+"use client"
+
 import Image from "next/image"
 import { MetaBlock } from './MetaBlock'
 import { NewsletterSubscribe } from './newsletter-subscribe'
+import { ScrollSubscribeModal } from './scroll-subscribe-modal'
+import { useScrollSubscribe } from '@/hooks/use-scroll-subscribe'
 
 type PostArticleProps = {
   postId: string
@@ -13,6 +17,11 @@ type PostArticleProps = {
 }
 
 export function PostArticle({ postId, title, date, image, category, tags = [], contentHtml }: PostArticleProps) {
+  const { showModal, dismissModal } = useScrollSubscribe({
+    scrollThreshold: 0.5, // Show after 60% scroll
+    delayMs: 200, // Wait 2 seconds after threshold
+  })
+
   return (
     <article className="mx-auto max-w-4xl px-6 py-12">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -41,6 +50,12 @@ export function PostArticle({ postId, title, date, image, category, tags = [], c
           <NewsletterSubscribe variant="compact" />
         </div>
       </div>
+
+      {/* Scroll-triggered subscription modal */}
+      <ScrollSubscribeModal
+        isOpen={showModal}
+        onClose={dismissModal}
+      />
     </article>
   )
 }
