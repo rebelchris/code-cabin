@@ -1,0 +1,36 @@
+# Code Cabin
+
+> Engineering management lessons from the trenches. Real experiments, honest outcomes.
+
+Code Cabin is a blog by Chris Bongers, Engineering Manager at daily.dev. It covers leadership, communication, personal growth, and hard lessons from managing engineering teams.
+
+## What it covers
+
+- Engineering management struggles and wins
+- Team communication and feedback
+- Work-life balance (and failing at it)
+- AI's impact on engineering teams
+- Impostor syndrome and self-doubt
+- The invisible work of management
+- Lessons from failure, not success
+
+## About the author
+
+Chris Bongers is an Engineering Manager at daily.dev. Dad to two kids under 3. Based in the Netherlands, moving to South Africa. He writes about what he's learning, not what he's mastered.
+
+## Popular posts
+
+- "I Ask AI For Permission Now (And I Hate Myself For It)" - On using AI as a validation crutch
+- "The Kindest Thing I Did Was Let Someone Go" - On difficult termination decisions
+- "You're Only Visible When Something Breaks" - On the invisible work of management
+- "Frustration Means You Give a Shit" - On turning venting into action
+
+## Links
+
+- Website: https://www.codecabin.dev
+- Author LinkedIn: https://www.linkedin.com/in/chrisbongers/
+- Author Twitter: https://x.com/AiChrisB
+
+## Contact
+
+Chris Bongers - chris@codecabin.dev

@@ -73,8 +73,43 @@ export default async function PostPage({ params }: PostPageProps) {
   }
   const postData = await buildPostViewBySlug(id)
 
+  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.codecabin.dev';
+  
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: postData.title,
+    description: post.description || `Read the latest post from Code Cabin: ${postData.title}.`,
+    datePublished: post.date ? new Date(post.date).toISOString() : undefined,
+    dateModified: post.date ? new Date(post.date).toISOString() : undefined,
+    author: {
+      "@type": "Person",
+      name: "Chris Bongers",
+      url: "https://www.linkedin.com/in/chrisbongers/",
+      jobTitle: "Engineering Manager",
+      worksFor: {
+        "@type": "Organization",
+        name: "daily.dev",
+      },
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Code Cabin",
+      url: BASE_URL,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/post/${params.id}`,
+    },
+    image: post.image || `${BASE_URL}/opengraph-image.png`,
+  };
+
   return (
     <div className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
       {/* Back button */}
       <div className="mx-auto max-w-4xl px-6 py-6">
         <Link
