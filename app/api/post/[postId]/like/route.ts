@@ -18,11 +18,12 @@ const getKeys = (postId: string, hashedIp?: string) => ({
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { postId: string } }
+    { params }: { params: Promise<{ postId: string }> }
 ) {
+    const { postId } = await params;
     const client = await redis.use();
     const hashedIp = getHashedIp(req);
-    const { likes, ip } = getKeys(params.postId, hashedIp);
+    const { likes, ip } = getKeys(postId, hashedIp);
 
     try {
         // Check if this IP has already liked
@@ -54,7 +55,7 @@ export async function POST(
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { postId: string } }
+    { params }: { params: Promise<{ postId: string }> }
 ) {
     const { postId } = await params;
     const client = await redis.use();

@@ -2,7 +2,7 @@ import { PostModalClient } from "@/components/post-modal-client";
 import { buildPostViewBySlug } from "@/lib/post-view";
 
 type PageProps = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default async function Page({ params }: PageProps) {

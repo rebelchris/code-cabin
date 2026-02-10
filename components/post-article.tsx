@@ -3,7 +3,6 @@
 import Image from "next/image"
 import { MetaBlock } from './MetaBlock'
 import { NewsletterSubscribe } from './newsletter-subscribe'
-import { ScrollSubscribeModal } from './scroll-subscribe-modal'
 
 type PostArticleProps = {
   postId: string
@@ -45,11 +44,6 @@ export function PostArticle({ postId, title, date, image, category, tags = [], c
         </div>
       </div>
 
-      {/* Scroll-triggered subscription modal */}
-      <ScrollSubscribeModal
-        isOpen={showModal}
-        onClose={dismissModal}
-      />
     </article>
   )
 }

@@ -16,11 +16,12 @@ export async function generateStaticParams() {
 
 // Define the Props type for both the component and generateMetadata
 type PostPageProps = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 };
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
-  const slug = params.id;
+  const { id } = await params;
+  const slug = id;
   const post = getPostBySlug(slug) as any;
 
   if (!post) {
@@ -65,11 +66,12 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 
 
 export default async function PostPage({ params }: PostPageProps) {
-  const post = getPostBySlug(`${params.id}`) as any
+  const { id } = await params;
+  const post = getPostBySlug(id) as any
   if (!post) {
     notFound()
   }
-  const postData = await buildPostViewBySlug(params.id)
+  const postData = await buildPostViewBySlug(id)
 
   return (
     <div className="min-h-screen">
@@ -85,7 +87,7 @@ export default async function PostPage({ params }: PostPageProps) {
       </div>
 
       <PostArticle
-        postId={params.id}
+        postId={id}
         title={postData.title}
         date={postData.date}
         image={postData.image}
