@@ -1,30 +1,34 @@
-import { getAllPosts } from '@/lib/markdown';
-import { MetadataRoute } from 'next';
+import { getAllPosts } from "@/lib/markdown"
+import { MetadataRoute } from "next"
+import { SITE_URL, toValidDate } from "@/lib/seo"
 
-const BASE_URL = 'https://www.codecabin.dev';
+export default function sitemap(): MetadataRoute.Sitemap {
+  const allPosts = getAllPosts()
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const allPosts = await getAllPosts();
+  const postsRoutes: MetadataRoute.Sitemap = allPosts.map((post) => {
+    const lastModified = toValidDate(post.date)
 
-    // 1. Generate Dynamic Post Routes
-    const postsRoutes: MetadataRoute.Sitemap = allPosts.map((post) => ({
-        url: `${BASE_URL}/post/${post.slug}`,
-        lastModified: new Date(post.date).toISOString(),
-        changeFrequency: 'weekly',
-        priority: 0.8,
-    }));
+    return {
+      url: `${SITE_URL}/post/${post.slug}`,
+      ...(lastModified ? { lastModified } : {}),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    }
+  })
 
-    // 2. Define Static Routes (Home, About, etc.)
-    const staticRoutes: MetadataRoute.Sitemap = [
-        // Home Page
-        {
-            url: BASE_URL,
-            lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 1,
-        },
-    ];
+  const mostRecentPostDate = allPosts
+    .map((post) => toValidDate(post.date))
+    .filter((date): date is Date => Boolean(date))
+    .sort((dateA, dateB) => dateB.getTime() - dateA.getTime())[0]
 
-    // 3. Combine and return all routes
-    return [...staticRoutes, ...postsRoutes];
+  const staticRoutes: MetadataRoute.Sitemap = [
+    {
+      url: SITE_URL,
+      lastModified: mostRecentPostDate || new Date(),
+      changeFrequency: "daily",
+      priority: 1,
+    },
+  ]
+
+  return [...staticRoutes, ...postsRoutes]
 }

@@ -1,12 +1,30 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from "next"
+import { SITE_URL } from "@/lib/seo"
 
 export default function robots(): MetadataRoute.Robots {
-    return {
-        rules: {
-            userAgent: '*', // Apply rules to all user agents (bots)
-            allow: '/',     // Allow crawling of all pages
-            disallow: '/api/', // Disallow crawling of specific paths (optional)
-        },
-        sitemap: `${process.env.NEXT_PUBLIC_WEBSITE_URL}/sitemap.xml`, // Specify your sitemap URL
-    };
+  return {
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/api/"],
+      },
+      {
+        userAgent: [
+          "GPTBot",
+          "OAI-SearchBot",
+          "ChatGPT-User",
+          "ClaudeBot",
+          "Claude-SearchBot",
+          "PerplexityBot",
+          "Perplexity-User",
+          "CCBot",
+        ],
+        allow: "/",
+        disallow: ["/api/"],
+      },
+    ],
+    host: SITE_URL,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+  }
 }

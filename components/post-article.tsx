@@ -7,6 +7,7 @@ import { NewsletterSubscribe } from './newsletter-subscribe'
 type PostArticleProps = {
   postId: string
   title: string
+  description?: string
   date: string
   image?: string
   category: string
@@ -14,7 +15,7 @@ type PostArticleProps = {
   contentHtml: string
 }
 
-export function PostArticle({ postId, title, date, image, category, tags = [], contentHtml }: PostArticleProps) {
+export function PostArticle({ postId, title, description, date, image, category, tags = [], contentHtml }: PostArticleProps) {
   return (
     <article className="mx-auto max-w-4xl px-6 py-12">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -24,6 +25,8 @@ export function PostArticle({ postId, title, date, image, category, tags = [], c
       <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-5xl text-balance">
         {title}
       </h1>
+
+      {description && <p className="mt-4 max-w-3xl text-base text-muted-foreground">{description}</p>}
 
       <MetaBlock id={postId} category={category} tags={tags} />
 
@@ -47,5 +50,4 @@ export function PostArticle({ postId, title, date, image, category, tags = [], c
     </article>
   )
 }
-
 
