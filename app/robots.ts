@@ -1,30 +1,35 @@
-import type { MetadataRoute } from "next"
-import { SITE_URL } from "@/lib/seo"
+import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        disallow: ["/api/"],
-      },
-      {
-        userAgent: [
-          "GPTBot",
-          "OAI-SearchBot",
-          "ChatGPT-User",
-          "ClaudeBot",
-          "Claude-SearchBot",
-          "PerplexityBot",
-          "Perplexity-User",
-          "CCBot",
+    return {
+        rules: [
+            {
+                userAgent: '*',
+                allow: '/',
+                disallow: '/api/',
+            },
+            // Explicitly allow AI crawlers
+            {
+                userAgent: 'GPTBot',
+                allow: '/',
+                disallow: '/api/',
+            },
+            {
+                userAgent: 'ChatGPT-User',
+                allow: '/',
+                disallow: '/api/',
+            },
+            {
+                userAgent: 'Claude-Web',
+                allow: '/',
+                disallow: '/api/',
+            },
+            {
+                userAgent: 'PerplexityBot',
+                allow: '/',
+                disallow: '/api/',
+            },
         ],
-        allow: "/",
-        disallow: ["/api/"],
-      },
-    ],
-    host: SITE_URL,
-    sitemap: `${SITE_URL}/sitemap.xml`,
-  }
+        sitemap: `${process.env.NEXT_PUBLIC_WEBSITE_URL}/sitemap.xml`,
+    };
 }

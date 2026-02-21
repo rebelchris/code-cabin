@@ -1,20 +1,17 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
-import { getPostBySlug, getPostSlugs } from "@/lib/markdown"
-import type { Metadata } from "next"
-import { buildPostViewBySlug } from "@/lib/post-view"
-import { PostArticle } from "@/components/post-article"
-import {
-  DEFAULT_OG_IMAGE,
-  SITE_AUTHOR,
-  SITE_LOGO,
-  SITE_NAME,
-  SITE_URL,
-  toAbsoluteUrl,
-  toJsonLd,
-  toValidDate,
-} from "@/lib/seo"
+import {getPostBySlug, getPostSlugs} from "@/lib/markdown";
+import {Metadata} from "next";
+import { buildPostViewBySlug } from "@/lib/post-view";
+import { PostArticle } from "@/components/post-article";
+import { 
+  StructuredData, 
+  generateArticleSchema, 
+  generatePostBreadcrumbs,
+  authorSchema,
+  publisherSchema,
+} from "@/components/structured-data";
 
 export async function generateStaticParams() {
   const slugs = getPostSlugs()
@@ -27,138 +24,99 @@ export async function generateStaticParams() {
 // Define the Props type for both the component and generateMetadata
 type PostPageProps = {
   params: Promise<{ id: string }>
-}
-
-function getPostBySlugSafe(slug: string) {
-  try {
-    return getPostBySlug(slug)
-  } catch {
-    return null
-  }
-}
+};
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
-  const { id } = await params
-  const post = getPostBySlugSafe(id)
+  const { id } = await params;
+  const slug = id;
+  const post = getPostBySlug(slug) as any;
 
   if (!post) {
-    return {}
+    return {};
   }
 
-  const postTitle = post.title || "Untitled"
-  const postDescription = post.description || `Read ${postTitle} on ${SITE_NAME}.`
-  const canonicalPath = `/post/${id}`
-  const canonicalUrl = toAbsoluteUrl(canonicalPath)
-  const imageUrl = toAbsoluteUrl(post.image || DEFAULT_OG_IMAGE)
-  const publishedTime = toValidDate(post.date)?.toISOString()
-  const tags = Array.isArray(post.tags) ? post.tags : []
-  const category = post.category || undefined
+  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.codecabin.dev';
+  const canonicalUrl = `${BASE_URL}/post/${slug}`;
+  const description = post.description || `Read the latest post from Code Cabin: ${post.title}.`;
+  const imageUrl = post.image || `${BASE_URL}/opengraph-image.png`;
 
   return {
-    title: postTitle,
-    description: postDescription,
+    // Essential Metadata
+    title: `${post.title} | Code Cabin`,
+    description: description,
+
     alternates: {
-      canonical: canonicalPath,
+      canonical: canonicalUrl,
     },
-    authors: [{ name: SITE_AUTHOR, url: SITE_URL }],
-    keywords: tags,
+
     openGraph: {
-      title: postTitle,
-      description: postDescription,
+      title: post.title,
+      description: description,
       url: canonicalUrl,
-      type: "article",
-      siteName: SITE_NAME,
-      images: [
-        {
-          url: imageUrl,
-          alt: postTitle,
-        },
-      ],
-      publishedTime,
-      authors: [SITE_AUTHOR],
-      section: category,
-      tags,
+      type: 'article',
+      siteName: 'Code Cabin',
+      images: [{
+        url: imageUrl,
+        alt: post.title,
+      }],
+      publishedTime: post.date ? new Date(post.date).toISOString() : undefined,
     },
+
     twitter: {
-      card: "summary_large_image",
-      title: postTitle,
-      description: postDescription,
+      card: 'summary_large_image',
+      title: post.title,
+      description: description,
       images: [imageUrl],
     },
-  }
+  };
 }
 
 
 export default async function PostPage({ params }: PostPageProps) {
-  const { id } = await params
-  const post = getPostBySlugSafe(id)
+  const { id } = await params;
+  const post = getPostBySlug(id) as any
   if (!post) {
     notFound()
   }
   const postData = await buildPostViewBySlug(id)
 
-  const postUrl = toAbsoluteUrl(`/post/${id}`)
-  const postDateIso = toValidDate(postData.date)?.toISOString() || new Date(0).toISOString()
-  const postImage = toAbsoluteUrl(postData.image || DEFAULT_OG_IMAGE)
-  const postTags = Array.isArray(postData.tags) ? postData.tags : []
-  const postDescription = postData.description || `Read ${postData.title} on ${SITE_NAME}.`
+  // Calculate approximate word count for schema
+  const wordCount = postData.contentHtml
+    ? postData.contentHtml.replace(/<[^>]*>/g, '').split(/\s+/).length
+    : undefined;
 
-  const blogPostingJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    url: postUrl,
-    headline: postData.title,
-    description: postDescription,
-    datePublished: postDateIso,
-    dateModified: postDateIso,
-    isAccessibleForFree: true,
-    inLanguage: "en-US",
-    author: {
-      "@type": "Person",
-      name: SITE_AUTHOR,
-      url: SITE_URL,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      url: SITE_URL,
-      logo: {
-        "@type": "ImageObject",
-        url: toAbsoluteUrl(SITE_LOGO),
-      },
-    },
-    image: [postImage],
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": postUrl,
-    },
-    articleSection: postData.category,
-    keywords: postTags.join(", "),
-  }
+  // Generate Article structured data using the component
+  const articleSchema = generateArticleSchema({
+    title: postData.title,
+    description: post.description || `Read the latest post from Code Cabin: ${postData.title}.`,
+    slug: id,
+    datePublished: post.date,
+    dateModified: post.date, // Could be different if tracking modifications
+    image: post.image,
+    category: postData.category,
+    tags: postData.tags,
+    wordCount,
+  });
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: SITE_URL,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: postData.title,
-        item: postUrl,
-      },
-    ],
-  }
+  // Generate Breadcrumb structured data
+  const breadcrumbSchema = generatePostBreadcrumbs(
+    postData.title,
+    id,
+    postData.category
+  );
 
   return (
     <div className="min-h-screen">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(blogPostingJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(breadcrumbJsonLd) }} />
+      {/* Structured Data: Article + Breadcrumbs + Author + Publisher */}
+      <StructuredData 
+        data={[
+          articleSchema, 
+          breadcrumbSchema, 
+          { "@context": "https://schema.org", ...authorSchema },
+          { "@context": "https://schema.org", ...publisherSchema },
+        ]} 
+      />
+      
       {/* Back button */}
       <div className="mx-auto max-w-4xl px-6 py-6">
         <Link
@@ -173,7 +131,6 @@ export default async function PostPage({ params }: PostPageProps) {
       <PostArticle
         postId={id}
         title={postData.title}
-        description={postData.description}
         date={postData.date}
         image={postData.image}
         category={postData.category}

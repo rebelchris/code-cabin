@@ -7,61 +7,51 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 import { Suspense } from "react"
 import { Toaster } from "@/components/ui/toaster"
-import {
-  DEFAULT_OG_IMAGE,
-  DEFAULT_TWITTER_IMAGE,
-  SITE_AUTHOR,
-  SITE_DESCRIPTION,
-  SITE_LOGO,
-  SITE_NAME,
-  SITE_URL,
-  toAbsoluteUrl,
-  toJsonLd,
-} from "@/lib/seo"
+import { generateBlogSchema } from "@/components/structured-data"
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.codecabin.dev"
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(BASE_URL),
   title: {
-    default: `${SITE_NAME} | Engineering Management Lessons`,
-    template: `%s | ${SITE_NAME}`,
+    default: "Code Cabin - Engineering Management Lessons",
+    template: "%s | Code Cabin",
   },
-  description: SITE_DESCRIPTION,
-  alternates: {
-    canonical: "/",
-  },
-  applicationName: SITE_NAME,
-  category: "technology",
-  creator: SITE_AUTHOR,
-  publisher: SITE_NAME,
-  authors: [{ name: SITE_AUTHOR, url: SITE_URL }],
+  description: "Lessons from the engineering management trenches - real experiments, honest outcomes",
+  authors: [{ name: "Chris Bongers", url: "https://www.linkedin.com/in/chrisbongers/" }],
+  creator: "Chris Bongers",
   keywords: [
     "engineering management",
     "leadership",
-    "software engineering",
-    "career growth",
+    "software development",
     "team management",
+    "engineering manager",
+    "tech leadership",
+    "management lessons",
   ],
+  alternates: {
+    canonical: BASE_URL,
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: SITE_NAME,
-    url: SITE_URL,
-    title: `${SITE_NAME} | Engineering Management Lessons`,
-    description: SITE_DESCRIPTION,
+    url: BASE_URL,
+    siteName: "Code Cabin",
+    title: "Code Cabin - Engineering Management Lessons",
+    description: "Lessons from the engineering management trenches - real experiments, honest outcomes",
     images: [
       {
-        url: toAbsoluteUrl(DEFAULT_OG_IMAGE),
+        url: `${BASE_URL}/opengraph-image.png`,
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME} social card`,
+        alt: "Code Cabin - Engineering Management Lessons",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} | Engineering Management Lessons`,
-    description: SITE_DESCRIPTION,
-    images: [toAbsoluteUrl(DEFAULT_TWITTER_IMAGE)],
+    creator: "@AiChrisB",
+    site: "@AiChrisB",
   },
   robots: {
     index: true,
@@ -69,38 +59,15 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
       "max-video-preview": -1,
+      "max-image-preview": "large",
       "max-snippet": -1,
     },
   },
 }
 
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: SITE_NAME,
-  description: SITE_DESCRIPTION,
-  url: SITE_URL,
-  inLanguage: "en-US",
-  publisher: {
-    "@type": "Organization",
-    name: SITE_NAME,
-    url: SITE_URL,
-  },
-}
-
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: SITE_NAME,
-  url: SITE_URL,
-  logo: toAbsoluteUrl(SITE_LOGO),
-  founder: {
-    "@type": "Person",
-    name: SITE_AUTHOR,
-  },
-}
+// Enhanced blog schema with full Person, Organization, and WebSite data
+const blogSchema = generateBlogSchema()
 
 export default function RootLayout({
   children,
@@ -112,8 +79,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(websiteJsonLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(organizationJsonLd) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+        />
         <Suspense fallback={null}>{children}</Suspense>
         {modal}
         <Toaster />
