@@ -5,6 +5,13 @@ import {getPostBySlug, getPostSlugs} from "@/lib/markdown";
 import {Metadata} from "next";
 import { buildPostViewBySlug } from "@/lib/post-view";
 import { PostArticle } from "@/components/post-article";
+import { 
+  StructuredData, 
+  generateArticleSchema, 
+  generatePostBreadcrumbs,
+  authorSchema,
+  publisherSchema,
+} from "@/components/structured-data";
 
 export async function generateStaticParams() {
   const slugs = getPostSlugs()
@@ -73,43 +80,43 @@ export default async function PostPage({ params }: PostPageProps) {
   }
   const postData = await buildPostViewBySlug(id)
 
-  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.codecabin.dev';
-  
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: postData.title,
+  // Calculate approximate word count for schema
+  const wordCount = postData.contentHtml
+    ? postData.contentHtml.replace(/<[^>]*>/g, '').split(/\s+/).length
+    : undefined;
+
+  // Generate Article structured data using the component
+  const articleSchema = generateArticleSchema({
+    title: postData.title,
     description: post.description || `Read the latest post from Code Cabin: ${postData.title}.`,
-    datePublished: post.date ? new Date(post.date).toISOString() : undefined,
-    dateModified: post.date ? new Date(post.date).toISOString() : undefined,
-    author: {
-      "@type": "Person",
-      name: "Chris Bongers",
-      url: "https://www.linkedin.com/in/chrisbongers/",
-      jobTitle: "Engineering Manager",
-      worksFor: {
-        "@type": "Organization",
-        name: "daily.dev",
-      },
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Code Cabin",
-      url: BASE_URL,
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `${BASE_URL}/post/${params.id}`,
-    },
-    image: post.image || `${BASE_URL}/opengraph-image.png`,
-  };
+    slug: id,
+    datePublished: post.date,
+    dateModified: post.date, // Could be different if tracking modifications
+    image: post.image,
+    category: postData.category,
+    tags: postData.tags,
+    wordCount,
+  });
+
+  // Generate Breadcrumb structured data
+  const breadcrumbSchema = generatePostBreadcrumbs(
+    postData.title,
+    id,
+    postData.category
+  );
 
   return (
     <div className="min-h-screen">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      {/* Structured Data: Article + Breadcrumbs + Author + Publisher */}
+      <StructuredData 
+        data={[
+          articleSchema, 
+          breadcrumbSchema, 
+          { "@context": "https://schema.org", ...authorSchema },
+          { "@context": "https://schema.org", ...publisherSchema },
+        ]} 
       />
+      
       {/* Back button */}
       <div className="mx-auto max-w-4xl px-6 py-6">
         <Link
